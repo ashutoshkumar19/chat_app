@@ -100,8 +100,14 @@
 
   .current-user {
     background-color: #f0f0f0;
-    line-height: 50px;
-    vertical-align: middle;
+    height: 75px;
+
+    .username {
+      padding: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #000;
+    }
 
     .name-box {
       margin-left: 10px;
@@ -185,7 +191,7 @@
   }
 
   .user-list-container {
-    height: calc(100% - 132px);
+    height: calc(100% - 157px);
     background-color: #f5f5f5;
 
     .heading {
@@ -204,6 +210,11 @@
         border-bottom: 1px solid #f0f0f0;
         display: flex;
         cursor: pointer;
+        user-select: none;
+
+        &.active {
+          background-color: yellow;
+        }
 
         &:hover {
           background-color: #ffffff;
@@ -259,6 +270,7 @@
   margin-left: 275px;
   width: calc(100% - 275px);
   height: 100vh;
+  position: absolute;
 
   .chat-box {
     width: 100%;

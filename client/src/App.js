@@ -14,36 +14,40 @@ import './styles/App.scss';
 const socket = io.connect('http://localhost:5000');
 
 function App() {
-  const [state, setState] = useState({
+  const [userState, setUserState] = useState({
     name: generateUsername(7),
-    message: '',
     color: generateRandomColor(),
   });
 
-  const initialRoomState = {
-    id: generateRoomId(7),
-    members: {},
-  };
+  const [privateList, setPrivateList] = useState([]);
 
-  const [chatRoom, setChatRoom] = useState(initialRoomState);
+  useEffect(() => {
+    console.log('***********************');
+    console.log(privateList);
+    console.log('***********************');
+  }, [privateList]);
 
   return (
     <Fragment>
       <LeftSidebarComponent
         socket={socket}
-        state={state}
-        setState={setState}
-        chatRoom={chatRoom}
-        setChatRoom={setChatRoom}
+        userState={userState}
+        setUserState={setUserState}
+        privateList={privateList}
+        setPrivateList={setPrivateList}
       />
 
-      <ChatComponent
-        socket={socket}
-        state={state}
-        setState={setState}
-        chatRoom={chatRoom}
-        setChatRoom={setChatRoom}
-      />
+      {privateList.map((item, index) => (
+        <ChatComponent
+          key={index}
+          socket={socket}
+          userState={userState}
+          // setUserState={setUserState}
+          to_name={item.name}
+          status={item.status}
+        />
+      ))}
+      {/* <ChatComponent socket={socket} userState={userState} setUserState={setUserState} /> */}
     </Fragment>
   );
 }

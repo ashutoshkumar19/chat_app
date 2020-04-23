@@ -11,6 +11,13 @@ io.on('connection', (socket) => {
     io.emit('message', { name, message, color });
   });
 
+  socket.on('private_message', ({ to_name, name, message, color }) => {
+    console.log(to_name);
+
+    socketList[name].emit('sent_message', { to_name, name, message, color });
+    socketList[to_name].emit('received_message', { name, message, color });
+  });
+
   socket.on('new_user', ({ oldName, name, color }) => {
     try {
       if (oldName.length > 0) {
@@ -23,11 +30,15 @@ io.on('connection', (socket) => {
       socket.username = name;
       socketList[socket.username] = socket;
 
+      // console.log(socketList);
+
       updateUsernames();
     } catch (error) {
       console.log(error);
     }
   });
+
+  // socket.on('create_private_room')
 
   const updateUsernames = () => {
     io.emit('get_users', users);

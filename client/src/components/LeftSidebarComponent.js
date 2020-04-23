@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 
 import CreateJoinRoom from './CreateJoinRoom.component';
+import UserListItem from './UserListItem';
 import { generateUsername, generateRoomId, generateRandomColor } from './Functions';
 
-function LeftSidebarComponent({ socket, state, setState, chatRoom, setChatRoom }) {
-  const { name, message, color } = state;
+function LeftSidebarComponent({
+  socket,
+  userState,
+  setUserState,
+  privateList,
+  setPrivateList,
+}) {
+  const { name, color } = userState;
 
   const [oldName, setOldName] = useState('');
 
@@ -22,42 +29,49 @@ function LeftSidebarComponent({ socket, state, setState, chatRoom, setChatRoom }
   // Watch the socket to update userList
   useEffect(() => {
     socket.on('get_users', (users) => {
-      console.log('someone joined the chat');
-      console.log(users);
       setUserList(users);
+
+      // let temp_list = privateList;
+      // temp_list.splice(0, temp_list.length);
+
+      // users.map((user) => {
+      //   if (user.name !== name) {
+      //     temp_list.push({ name: user.name, status: 0 });
+      //   }
+      // });
+
+      // console.log('privateList:\n');
+      // console.log(privateList);
+
+      // console.log('Temp List:\n');
+      // console.log(temp_list);
+
+      // setPrivateList(temp_list);
+      // setPrivateList((prevList) => [...prevList]);
     });
   }, []);
 
   // Update userListElements when userList changes
   useEffect(() => {
     const elements = userList.map(
-      (item, index) =>
-        item.name !== name && (
-          <li key={index} className='user-list-item'>
-            <div className='img-div'>
-              <img
-                src='https://www.nicepng.com/png/detail/780-7805650_generic-user-image-male-man-cartoon-no-eyes.png'
-                alt=''
-              />
-            </div>
-            <div className='name-div'>
-              <p>{item.name}</p>
-            </div>
-            <div className='status-div'>
-              <div className='status-color'></div>
-            </div>
-          </li>
+      (user, index) =>
+        user.name !== name && (
+          <UserListItem
+            key={index}
+            user={user}
+            privateList={privateList}
+            setPrivateList={setPrivateList}
+          />
         )
     );
-
     setUserListElements(elements);
   }, [userList]);
 
   const onNameSubmit = (e) => {
     e.preventDefault();
     if (formData !== name) {
-      var userExists = userList.some((item) => {
-        if (item.name === formData) {
+      var userExists = userList.some((user) => {
+        if (user.name === formData) {
           return true;
         }
       });
@@ -65,7 +79,7 @@ function LeftSidebarComponent({ socket, state, setState, chatRoom, setChatRoom }
         alert('This username already exists !\nPlease choose another username...');
       } else {
         setOldName(name);
-        setState({ ...state, name: formData, color: generateRandomColor() });
+        setUserState({ ...userState, name: formData, color: generateRandomColor() });
       }
     }
   };
@@ -73,6 +87,7 @@ function LeftSidebarComponent({ socket, state, setState, chatRoom, setChatRoom }
   return (
     <div className='left-sidebar'>
       <div className='current-user' id='current-user'>
+        <p className='username'>{name}</p>
         <div className='name-box'>
           <form onSubmit={onNameSubmit}>
             <label htmlFor='name'>Name</label>
@@ -90,10 +105,8 @@ function LeftSidebarComponent({ socket, state, setState, chatRoom, setChatRoom }
       <div className='btn-container' id='btn-container'>
         <CreateJoinRoom
           socket={socket}
-          state={state}
-          setState={setState}
-          chatRoom={chatRoom}
-          setChatRoom={setChatRoom}
+          userState={userState}
+          setUserState={setUserState}
         />
       </div>
 

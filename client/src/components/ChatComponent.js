@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-import { generateUsername, generateRoomId, generateRandomColor } from './Functions';
+import { generateId } from './Functions';
 
-function ChatComponent({ socket, state, setState, chatRoom, setChatRoom }) {
-  const { name, message, color } = state;
+const elementId = generateId(5);
+
+function ChatComponent({ socket, userState, to_name, status }) {
+  const { name, color } = userState;
+
+  const [message, setMessage] = useState('');
 
   const [chat, setChat] = useState([]);
 
@@ -11,15 +15,29 @@ function ChatComponent({ socket, state, setState, chatRoom, setChatRoom }) {
 
   // Watch the socket to update chats
   useEffect(() => {
-    socket.on('message', ({ name, message, color }) => {
-      setChat((prevChats) => [...prevChats, { name, message, color }]);
+    const temp_to_name = to_name;
+    socket.on('sent_message', ({ to_name, name, message, color }) => {
+      if (temp_to_name === to_name) {
+        setChat((prevChats) => [...prevChats, { name, message, color }]);
+      }
+    });
+
+    socket.on('received_message', ({ name, message, color }) => {
+      if (name === to_name) {
+        setChat((prevChats) => [...prevChats, { name, message, color }]);
+      }
     });
   }, []);
 
   // Update chatListElements when chat changes
   useEffect(() => {
+    console.log(chat);
+
     const all_chats = chat.map(({ name, message, color }, index) => (
-      <div key={index} className={`chat-bubble ${name === state.name ? ' right' : ''}`}>
+      <div
+        key={index}
+        className={`chat-bubble ${name === userState.name ? ' right' : ''}`}
+      >
         <p className='username' style={{ color: `${color}` }}>
           {name}
         </p>
@@ -30,13 +48,13 @@ function ChatComponent({ socket, state, setState, chatRoom, setChatRoom }) {
     setChatListElements(all_chats);
 
     setTimeout(() => {
-      var element = document.getElementById('chat-list');
+      var element = document.getElementById('chat-list-' + elementId);
       element.scrollTop = element.scrollHeight;
     }, 50);
   }, [chat]);
 
   const onChange = (e) => {
-    setState({ ...state, [e.target.name]: e.target.value });
+    setMessage(e.target.value);
   };
 
   const onMessageSubmit = (e) => {
@@ -45,8 +63,8 @@ function ChatComponent({ socket, state, setState, chatRoom, setChatRoom }) {
     const messageText = message.trim();
     if (nameText.length > 0) {
       if (messageText.length > 0) {
-        socket.emit('message', { name, message, color });
-        setState({ ...state, message: '' });
+        socket.emit('private_message', { to_name, name, message, color });
+        setMessage('');
       }
     } else {
       alert('Please enter a name !');
@@ -54,19 +72,22 @@ function ChatComponent({ socket, state, setState, chatRoom, setChatRoom }) {
   };
 
   return (
-    <div className='chat-box-container'>
+    <div
+      className='chat-box-container'
+      style={status === 0 ? { visibility: 'hidden' } : { visibility: 'visible' }}
+    >
       <div className='chat-box'>
         <div className='chat-list-container'>
           <div className='heading'>
-            <p>All chats</p>
+            <p>{to_name}</p>
 
             <div className='name-box'>
-              <p className='name'>Public Chat Room</p>
+              {/* <p className='name'>Public Chat Room</p> */}
               {/* <p className='name'>{name}</p> */}
             </div>
           </div>
 
-          <div className='chat-list' id='chat-list'>
+          <div className='chat-list' id={`chat-list-` + elementId}>
             {chatListElements}
           </div>
         </div>
