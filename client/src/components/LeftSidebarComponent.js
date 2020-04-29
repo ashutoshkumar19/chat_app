@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 import CreateJoinRoom from './CreateJoinRoom.component';
-import UserListItem from './UserListItem';
+import UserListItem from './UserListItem.component';
 import { generateUsername, generateRoomId, generateRandomColor } from './Functions';
 
 function LeftSidebarComponent({
   socket,
+  userList,
+  setUserList,
   userState,
   setUserState,
   privateList,
@@ -17,37 +19,17 @@ function LeftSidebarComponent({
 
   const [formData, setFormData] = useState(name);
 
-  const [userList, setUserList] = useState([]);
-
   const [userListElements, setUserListElements] = useState('');
 
   // Tell server to add new user and remove old user when Username changes
   useEffect(() => {
-    socket.emit('new_user', { oldName, name, color });
+    socket.emit('new_user', oldName, name, color);
   }, [name]);
 
   // Watch the socket to update userList
   useEffect(() => {
     socket.on('get_users', (users) => {
       setUserList(users);
-
-      // let temp_list = privateList;
-      // temp_list.splice(0, temp_list.length);
-
-      // users.map((user) => {
-      //   if (user.name !== name) {
-      //     temp_list.push({ name: user.name, status: 0 });
-      //   }
-      // });
-
-      // console.log('privateList:\n');
-      // console.log(privateList);
-
-      // console.log('Temp List:\n');
-      // console.log(temp_list);
-
-      // setPrivateList(temp_list);
-      // setPrivateList((prevList) => [...prevList]);
     });
   }, []);
 
@@ -69,7 +51,7 @@ function LeftSidebarComponent({
 
   const onNameSubmit = (e) => {
     e.preventDefault();
-    if (formData !== name) {
+    if (formData.length > 0 && formData !== name) {
       var userExists = userList.some((user) => {
         if (user.name === formData) {
           return true;

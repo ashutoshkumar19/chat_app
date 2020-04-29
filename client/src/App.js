@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 
 import LeftSidebarComponent from './components/LeftSidebarComponent';
 import ChatComponent from './components/ChatComponent';
+
 import {
   generateUsername,
   generateRoomId,
@@ -19,6 +20,8 @@ function App() {
     color: generateRandomColor(),
   });
 
+  const [userList, setUserList] = useState([]);
+
   const [privateList, setPrivateList] = useState([]);
 
   useEffect(() => {
@@ -31,6 +34,8 @@ function App() {
     <Fragment>
       <LeftSidebarComponent
         socket={socket}
+        userList={userList}
+        setUserList={setUserList}
         userState={userState}
         setUserState={setUserState}
         privateList={privateList}
@@ -42,7 +47,6 @@ function App() {
           key={index}
           socket={socket}
           userState={userState}
-          // setUserState={setUserState}
           to_name={item.name}
           status={item.status}
         />

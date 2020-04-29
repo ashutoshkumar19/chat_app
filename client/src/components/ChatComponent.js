@@ -15,24 +15,28 @@ function ChatComponent({ socket, userState, to_name, status }) {
 
   // Watch the socket to update chats
   useEffect(() => {
-    const temp_to_name = to_name;
-    socket.on('sent_message', ({ to_name, name, message, color }) => {
-      if (temp_to_name === to_name) {
+    socket.on('sent_message', (sent_to_name, name, message, color) => {
+      if (to_name === sent_to_name) {
+        console.log('To Name: ' + to_name + '\nSent To Name: ' + sent_to_name);
+
         setChat((prevChats) => [...prevChats, { name, message, color }]);
       }
     });
 
-    socket.on('received_message', ({ name, message, color }) => {
-      if (name === to_name) {
-        setChat((prevChats) => [...prevChats, { name, message, color }]);
+    socket.on('received_message', (received_from_name, message, color) => {
+      if (received_from_name === to_name) {
+        console.log('From Name: ' + received_from_name + '\nTo Name: ' + to_name);
+
+        setChat((prevChats) => [
+          ...prevChats,
+          { name: received_from_name, message: message, color: color },
+        ]);
       }
     });
   }, []);
 
   // Update chatListElements when chat changes
   useEffect(() => {
-    console.log(chat);
-
     const all_chats = chat.map(({ name, message, color }, index) => (
       <div
         key={index}
@@ -63,7 +67,7 @@ function ChatComponent({ socket, userState, to_name, status }) {
     const messageText = message.trim();
     if (nameText.length > 0) {
       if (messageText.length > 0) {
-        socket.emit('private_message', { to_name, name, message, color });
+        socket.emit('private_message', to_name, name, message, color);
         setMessage('');
       }
     } else {

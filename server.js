@@ -7,18 +7,20 @@ users = [];
 socketList = {};
 
 io.on('connection', (socket) => {
-  socket.on('message', ({ name, message, color }) => {
-    io.emit('message', { name, message, color });
+  socket.on('message', (name, message, color) => {
+    io.emit('message', name, message, color);
   });
 
-  socket.on('private_message', ({ to_name, name, message, color }) => {
-    console.log(to_name);
-
-    socketList[name].emit('sent_message', { to_name, name, message, color });
-    socketList[to_name].emit('received_message', { name, message, color });
+  socket.on('private_message', (to_name, name, message, color) => {
+    try {
+      socketList[name.toString()].emit('sent_message', to_name, name, message, color);
+      socketList[to_name.toString()].emit('received_message', name, message, color);
+    } catch (error) {
+      console.log(error);
+    }
   });
 
-  socket.on('new_user', ({ oldName, name, color }) => {
+  socket.on('new_user', (oldName, name, color) => {
     try {
       if (oldName.length > 0) {
         removeSocket(oldName);
@@ -40,10 +42,12 @@ io.on('connection', (socket) => {
 
   // socket.on('create_private_room')
 
+  // Update Usernames on clients
   const updateUsernames = () => {
     io.emit('get_users', users);
   };
 
+  // Remove socket on server
   const removeSocket = (username) => {
     console.log(username + ' disconnected');
     users = users.filter((user) => user.name !== username);
