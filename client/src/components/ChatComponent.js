@@ -137,7 +137,9 @@ function ChatComponent({ socket, userState, to_name, status }) {
               onChange={(e) => onChange(e)}
               placeholder='Type a message...'
             />
-            <button type='submit'>Send</button>
+            <button type='submit'>
+              <span class='material-icons'>send</span>
+            </button>
           </form>
         </div>
       </div>
