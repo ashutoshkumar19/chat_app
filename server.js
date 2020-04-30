@@ -7,6 +7,29 @@ users = [];
 socketList = {};
 
 io.on('connection', (socket) => {
+  socket.on('new_user', (oldName, name, color) => {
+    try {
+      if (oldName.length > 0) {
+        removeSocket(oldName);
+      }
+
+      users.push({ name: name, color: color });
+      console.log(users);
+
+      socket.username = name;
+      socketList[socket.username] = socket;
+
+      updateUsernames();
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // Update Usernames on clients
+  const updateUsernames = () => {
+    io.emit('get_users', users);
+  };
+
   socket.on('message', (name, message, color) => {
     io.emit('message', name, message, color);
   });
@@ -20,38 +43,38 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('new_user', (oldName, name, color) => {
+  socket.on('join_notify', (to_name, name) => {
     try {
-      if (oldName.length > 0) {
-        removeSocket(oldName);
-      }
-
-      users.push({ name: name, color: color });
-      console.log(users);
-
-      socket.username = name;
-      socketList[socket.username] = socket;
-
-      // console.log(socketList);
-
-      updateUsernames();
+      socketList[to_name.toString()].emit('join_notify', name);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  socket.on('join_notify_acknowledge', (to_name, name) => {
+    try {
+      socketList[to_name.toString()].emit('join_notify_acknowledge', name);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  socket.on('leave_notify', (to_name, name) => {
+    try {
+      socketList[to_name.toString()].emit('leave_notify', name);
     } catch (error) {
       console.log(error);
     }
   });
 
-  // socket.on('create_private_room')
-
-  // Update Usernames on clients
-  const updateUsernames = () => {
-    io.emit('get_users', users);
-  };
-
   // Remove socket on server
   const removeSocket = (username) => {
-    console.log(username + ' disconnected');
-    users = users.filter((user) => user.name !== username);
-    delete socketList[username];
+    try {
+      users = users.filter((user) => user.name !== username);
+      delete socketList[username];
+      console.log(username + ' disconnected');
+      io.emit('leave_notify', username);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   socket.on('disconnect', (data) => {

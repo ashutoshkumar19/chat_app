@@ -297,13 +297,21 @@
           margin-left: 5px;
           font-size: 18px;
         }
-        .name-box {
+        .details-box {
           margin-left: auto;
           margin-right: 5px;
 
-          .name {
+          .detail {
             font-size: 16px;
             color: #fafafa;
+          }
+          .joined {
+            font-size: 16px;
+            color: #02df02;
+          }
+          .left {
+            font-size: 16px;
+            color: #ff5448;
           }
         }
       }
