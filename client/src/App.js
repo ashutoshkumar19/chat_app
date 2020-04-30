@@ -12,10 +12,10 @@ import {
 
 import './styles/App.scss';
 
-const PORT = process.env.PORT || 5000;
+// const PORT = process.env.PORT || 5000;
 // const socket = io.connect(`http://localhost:${process.env.PORT || 5000}`);
 // const socket = io.connect('http://localhost:5000');
-const socket = io.connect(`http://realtime-chat-2020:${process.env.PORT || 5000}`);
+const socket = io.connect('/');
 
 function App() {
   const [userState, setUserState] = useState({
