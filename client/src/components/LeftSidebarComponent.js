@@ -21,6 +21,8 @@ function LeftSidebarComponent({
 
   const [userListElements, setUserListElements] = useState('');
 
+  const [isSidebarHidden, setIsSidebarHidden] = useState(false);
+
   // Tell server to add new user and remove old user when Username changes
   useEffect(() => {
     socket.emit('new_user', oldName, name, color);
@@ -67,7 +69,17 @@ function LeftSidebarComponent({
   };
 
   return (
-    <div className='left-sidebar'>
+    <div className={`left-sidebar ${isSidebarHidden && `hidden`}`}>
+      <div
+        className={`sidebar-toggle ${isSidebarHidden && `menu-btn`}`}
+        onClick={() => setIsSidebarHidden(!isSidebarHidden)}
+      >
+        {isSidebarHidden ? (
+          <span class='material-icons'>menu</span>
+        ) : (
+          <span class='material-icons'>arrow_back</span>
+        )}
+      </div>
       <div className='current-user' id='current-user'>
         <p className='username'>{name}</p>
         <div className='name-box'>

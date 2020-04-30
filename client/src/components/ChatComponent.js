@@ -107,7 +107,7 @@ function ChatComponent({ socket, userState, to_name, status }) {
   return (
     <div
       className='chat-box-container'
-      style={status === 0 ? { visibility: 'hidden' } : { visibility: 'visible' }}
+      style={status === 0 ? { display: 'none' } : { display: 'block' }}
     >
       <div className='chat-box'>
         <div className='chat-list-container'>
