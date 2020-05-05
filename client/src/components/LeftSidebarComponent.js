@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 import CreateJoinRoom from './CreateJoinRoom.component';
 import UserListItem from './UserListItem.component';
-import { generateUsername, generateRoomId, generateRandomColor } from './Functions';
+import { generateRandomColor } from './Functions';
+import RoomListItem from './RoomListItem.component';
 
 function LeftSidebarComponent({
   socket,
@@ -12,20 +13,28 @@ function LeftSidebarComponent({
   setUserState,
   privateList,
   setPrivateList,
+  roomState,
+  setRoomState,
 }) {
-  const { name, color } = userState;
+  const { userId, name, color } = userState;
 
-  const [oldName, setOldName] = useState('');
+  const { createRoomId, joinRoomId } = roomState;
 
+  const [isNameForm, setIsNameForm] = useState(false);
   const [formData, setFormData] = useState(name);
 
   const [userListElements, setUserListElements] = useState('');
+  const [roomListElements, setRoomListElements] = useState('');
 
   const [isSidebarHidden, setIsSidebarHidden] = useState(false);
 
-  // Tell server to add new user and remove old user when Username changes
+  // Tell server to add new user when userId changes
   useEffect(() => {
-    socket.emit('new_user', oldName, name, color);
+    socket.emit('new_user', userId, name, color);
+  }, [userId]);
+
+  useEffect(() => {
+    socket.emit('change_name', name, color);
   }, [name]);
 
   // Watch the socket to update userList
@@ -39,7 +48,7 @@ function LeftSidebarComponent({
   useEffect(() => {
     const elements = userList.map(
       (user, index) =>
-        user.name !== name && (
+        user.userId !== userId && (
           <UserListItem
             key={index}
             user={user}
@@ -51,21 +60,15 @@ function LeftSidebarComponent({
     setUserListElements(elements);
   }, [userList]);
 
+  // Handle name change
   const onNameSubmit = (e) => {
     e.preventDefault();
-    if (formData.length > 0 && formData !== name) {
-      var userExists = userList.some((user) => {
-        if (user.name === formData) {
-          return true;
-        }
-      });
-      if (userExists) {
-        alert('This username already exists !\nPlease choose another username...');
-      } else {
-        setOldName(name);
-        setUserState({ ...userState, name: formData, color: generateRandomColor() });
-      }
+    let name_text = formData.trim();
+    if (name_text !== name) {
+      setUserState({ ...userState, name: name_text, color: generateRandomColor() });
     }
+    setIsNameForm(false);
+    setFormData(name_text);
   };
 
   return (
@@ -75,25 +78,47 @@ function LeftSidebarComponent({
         onClick={() => setIsSidebarHidden(!isSidebarHidden)}
       >
         {isSidebarHidden ? (
-          <span class='material-icons'>menu</span>
+          <span className='material-icons'>menu</span>
         ) : (
-          <span class='material-icons'>arrow_back</span>
+          <span className='material-icons'>arrow_back</span>
         )}
       </div>
+
       <div className='current-user' id='current-user'>
-        <p className='username'>{name}</p>
-        <div className='name-box'>
-          <form onSubmit={onNameSubmit}>
-            <label htmlFor='name'>Name</label>
-            <input
-              type='text'
-              name='name'
-              value={formData}
-              onChange={(e) => setFormData(e.target.value)}
-            />
-            <button type='submit'>Login</button>
-          </form>
-        </div>
+        {isNameForm ? (
+          <div className='name-box'>
+            <form onSubmit={onNameSubmit}>
+              <label htmlFor='name'>Name</label>
+              <input
+                type='text'
+                name='name'
+                autoFocus
+                value={formData}
+                onChange={(e) => setFormData(e.target.value)}
+              />
+              <button type='submit'>Done</button>
+            </form>
+          </div>
+        ) : (
+          <>
+            {name.length > 0 ? (
+              <div style={{ display: 'flex' }}>
+                <p className='name'>{name}</p>
+                <span className='link sm' onClick={(e) => setIsNameForm(true)}>
+                  Change Name
+                </span>
+              </div>
+            ) : (
+              <div className='name link' onClick={(e) => setIsNameForm(true)}>
+                Please enter your name
+              </div>
+            )}
+          </>
+        )}
+
+        <p className='userId'>
+          User Id: <span>{userId}</span>
+        </p>
       </div>
 
       <div className='btn-container' id='btn-container'>
@@ -101,12 +126,30 @@ function LeftSidebarComponent({
           socket={socket}
           userState={userState}
           setUserState={setUserState}
+          roomState={roomState}
+          setRoomState={setRoomState}
         />
       </div>
 
       <div className='user-list-container'>
-        <p className='heading'>Online users</p>
-        <ul className='user-list'>{userListElements}</ul>
+        <p className='heading'>Online users and rooms</p>
+        <ul className='user-list'>
+          {createRoomId.length > 0 && (
+            <RoomListItem
+              roomId={createRoomId}
+              roomState={roomState}
+              setRoomState={setRoomState}
+            />
+          )}
+          {joinRoomId.length > 0 && (
+            <RoomListItem
+              roomId={joinRoomId}
+              roomState={roomState}
+              setRoomState={setRoomState}
+            />
+          )}
+          {userListElements}
+        </ul>
       </div>
     </div>
   );

@@ -4,11 +4,7 @@ import io from 'socket.io-client';
 import LeftSidebarComponent from './components/LeftSidebarComponent';
 import ChatComponent from './components/ChatComponent';
 
-import {
-  generateUsername,
-  generateRoomId,
-  generateRandomColor,
-} from './components/Functions';
+import { generateUserId, generateRandomColor } from './components/Functions';
 
 import './styles/App.scss';
 
@@ -17,13 +13,18 @@ const socket = io.connect('/');
 
 function App() {
   const [userState, setUserState] = useState({
-    name: generateUsername(7),
+    userId: generateUserId(7),
+    name: '',
     color: generateRandomColor(),
   });
 
   const [userList, setUserList] = useState([]);
 
   const [privateList, setPrivateList] = useState([]);
+
+  const [roomList, setRoomList] = useState([]);
+
+  const [roomState, setRoomState] = useState({ createRoomId: '', joinRoomId: '' });
 
   useEffect(() => {
     console.log('***********************');
@@ -41,16 +42,12 @@ function App() {
         setUserState={setUserState}
         privateList={privateList}
         setPrivateList={setPrivateList}
+        roomState={roomState}
+        setRoomState={setRoomState}
       />
 
       {privateList.map((item, index) => (
-        <ChatComponent
-          key={index}
-          socket={socket}
-          userState={userState}
-          to_name={item.name}
-          status={item.status}
-        />
+        <ChatComponent key={index} socket={socket} userState={userState} to_user={item} />
       ))}
       {/* <ChatComponent socket={socket} userState={userState} setUserState={setUserState} /> */}
     </Fragment>

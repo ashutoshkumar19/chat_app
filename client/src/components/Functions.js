@@ -27,7 +27,7 @@ export const generateRandomColor = () => {
 };
 
 // Generate random Id
-export const generateId = (length) => {
+export const generateUserId = (length) => {
   var result = '';
   var characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   var charactersLength = characters.length;

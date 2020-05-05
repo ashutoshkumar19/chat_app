@@ -94,7 +94,7 @@
   min-width: 275px;
   max-width: 275px;
   height: 100vh;
-  overflow-y: hidden;
+  // overflow-y: hidden;
   background-color: #fafafa;
   transition: ease-in-out 200ms;
 
@@ -104,7 +104,7 @@
 
   .sidebar-toggle {
     position: absolute;
-    margin: 0px 0 0 240px;
+    margin: 0px 0 0 275px;
     padding: 3px;
     width: 35px;
     height: 35px;
@@ -115,11 +115,7 @@
     cursor: pointer;
     user-select: none;
     transition: ease-in-out 200ms;
-
-    &.menu-btn {
-      margin-left: 275px;
-      z-index: 1000;
-    }
+    z-index: 1;
 
     &:hover,
     &:active {
@@ -133,17 +129,40 @@
 
   .current-user {
     background-color: #f0f0f0;
-    height: 75px;
+    // height: 75px;
 
-    .username {
-      padding: 10px;
+    .name {
+      padding: 10px 10px 5px;
+
       font-size: 20px;
       font-weight: bold;
       color: #000;
     }
+    .link {
+      font-size: 16px;
+      color: #0077ff;
+      cursor: pointer;
+      &.sm {
+        font-size: 12px;
+        position: absolute;
+        margin-top: 45px;
+        margin-left: 190px;
+      }
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    .userId {
+      padding: 5px 10px;
+      font-size: 14px;
+      color: #000;
+      span {
+        font-weight: bold;
+      }
+    }
 
     .name-box {
-      margin-left: 10px;
+      padding: 10px 10px 5px;
       form {
         label {
           font-size: 14px;
@@ -232,6 +251,8 @@
       line-height: 25px;
       font-size: 16px;
       color: #aeaeae;
+      width: auto;
+      position: sticky;
     }
     .user-list {
       height: calc(100% - 25px);
@@ -248,6 +269,56 @@
         &.active {
           background-color: yellow;
         }
+
+        &:hover {
+          background-color: #ffffff;
+          box-shadow: 2px 0px 8px 0 #cecece;
+          .name-div p {
+            color: rgb(0, 141, 141);
+            font-weight: bold;
+          }
+        }
+
+        .img-div {
+          height: 40px;
+          width: 40px;
+          border-radius: 100%;
+          overflow: hidden;
+          img {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            object-fit: scale-down;
+          }
+        }
+
+        .name-div {
+          width: calc(100% - 50px);
+          padding: 10px 10px;
+          p {
+            margin-top: auto;
+          }
+        }
+
+        .status-div {
+          width: 15px;
+          padding: 15px 0;
+
+          .status-color {
+            margin: auto;
+            width: 10px;
+            height: 10px;
+            border-radius: 25px;
+            background-color: rgb(0, 206, 0);
+          }
+        }
+      }
+
+      .room-list-item {
+        padding: 5px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        cursor: pointer;
 
         &:hover {
           background-color: #ffffff;
@@ -325,7 +396,7 @@
         p {
           color: #fafafa;
           margin-left: 35px;
-          font-size: 18px;
+          font-size: 14px;
         }
         .details-box {
           margin-left: auto;
@@ -364,9 +435,9 @@
           background-color: #fefefe;
           color: #000;
           border-radius: 0 10px 10px 10px;
-          box-shadow: 1px 1px 1px 0 #cecece;
+          box-shadow: 1px 1px 2px 0 #6e6e6e;
 
-          .username {
+          .name {
             font-size: 13px;
             width: fit-content;
           }
@@ -379,7 +450,8 @@
           margin-left: auto;
           background-color: #c5fdd3;
           border-radius: 10px 0 10px 10px;
-          .username {
+          box-shadow: -1px 1px 2px 0 #6e6e6e;
+          .name {
             margin-left: auto;
           }
         }

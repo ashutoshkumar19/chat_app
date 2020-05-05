@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
-function UserListItem({ user, privateList, setPrivateList }) {
-  // Open chat box
-  const openChatWindow = () => {
+function RoomListItem({ roomId, roomState, setRoomState }) {
+  {
+    /*const openChatWindow = () => {
     var userExists = privateList.some((item) => {
-      if (item.userId === user.userId) {
+      if (item.name === user.name) {
         return true;
       }
     });
     let temp = privateList;
     if (userExists) {
-      const userIndex = privateList.findIndex(
-        (element) => element.userId === user.userId
-      );
+      const userIndex = privateList.findIndex((element) => element.name === user.name);
       const statusIndex = privateList.findIndex((element) => element.status === 1);
 
       temp[statusIndex] = {
@@ -21,7 +19,6 @@ function UserListItem({ user, privateList, setPrivateList }) {
       };
       temp[userIndex] = {
         ...temp[userIndex],
-        name: user.name,
         status: 1,
       };
     } else {
@@ -32,22 +29,24 @@ function UserListItem({ user, privateList, setPrivateList }) {
           status: 0,
         };
       }
-      temp.push({ userId: user.userId, name: user.name, status: 1 });
+      temp.push({ name: user.name, status: 1 });
     }
     setPrivateList(temp);
     setPrivateList((prevList) => [...prevList]);
-  };
+  };*/
+  }
 
   return (
-    <li className='user-list-item' onClick={(e) => openChatWindow()}>
+    // <li className='user-list-item' onClick={(e) => openChatWindow()}>
+    <li className='room-list-item'>
       <div className='img-div'>
         <img
-          src='https://www.nicepng.com/png/detail/780-7805650_generic-user-image-male-man-cartoon-no-eyes.png'
+          src='https://viewsgain.com/wp-content/uploads/2018/08/Buy-Youtube-Subscribers.png'
           alt=''
         />
       </div>
       <div className='name-div'>
-        <p>{user.name ? user.name : user.userId}</p>
+        <p>{roomId}</p>
       </div>
       <div className='status-div'>
         <div className='status-color'></div>
@@ -56,4 +55,4 @@ function UserListItem({ user, privateList, setPrivateList }) {
   );
 }
 
-export default UserListItem;
+export default RoomListItem;

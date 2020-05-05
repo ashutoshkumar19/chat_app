@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
-import { generateId } from './Functions';
+import { generateUserId } from './Functions';
 
-const elementId = generateId(5);
+const elementId = generateUserId(5);
 
-function ChatComponent({ socket, userState, to_name, status }) {
-  const { name, color } = userState;
+function ChatComponent({ socket, userState, to_user }) {
+  const { userId, name, color } = userState;
+
+  const to_userId = to_user.userId;
+  const to_name = to_user.name;
+  const status = to_user.status;
 
   const [message, setMessage] = useState('');
 
@@ -17,72 +21,82 @@ function ChatComponent({ socket, userState, to_name, status }) {
 
   // Watch the socket to update chats and get notified
   useEffect(() => {
-    socket.on('sent_message', (sent_to_name, name, message, color) => {
-      if (to_name === sent_to_name) {
-        // console.log('To Name: ' + to_name + '\nSent To Name: ' + sent_to_name);
-        setChat((prevChats) => [...prevChats, { name, message, color }]);
-      }
-    });
-
-    socket.on('received_message', (received_from_name, message, color) => {
-      if (received_from_name === to_name) {
-        // console.log('From Name: ' + received_from_name + '\nTo Name: ' + to_name);
+    socket.on('sent_message', (sent_to_userId, from_name, from_color, message) => {
+      if (sent_to_userId === to_userId) {
         setChat((prevChats) => [
           ...prevChats,
-          { name: received_from_name, message: message, color: color },
+          { userId: userId, name: from_name, color: from_color, message: message },
         ]);
       }
     });
 
-    socket.on('join_notify', (name) => {
-      if (name === to_name) {
-        console.log(name + ' joined the chat');
+    socket.on(
+      'received_message',
+      (received_from_userId, received_from_name, received_from_color, message) => {
+        if (received_from_userId === to_userId) {
+          setChat((prevChats) => [
+            ...prevChats,
+            {
+              userId: received_from_userId,
+              name: received_from_name,
+              color: received_from_color,
+              message: message,
+            },
+          ]);
+        }
+      }
+    );
+
+    socket.on('join_notify', (from_userId, from_name) => {
+      if (from_userId === to_userId) {
+        console.log(`${from_name} (${from_userId}) joined the chat`);
         setIsConnected(true);
-        socket.emit('join_notify_acknowledge', to_name, userState.name);
+        socket.emit('join_notify_acknowledge', to_userId);
       }
     });
-    socket.on('join_notify_acknowledge', (name) => {
-      if (name === to_name) {
-        console.log(name + ' joined the chat');
+    socket.on('join_notify_acknowledge', (from_userId, from_name) => {
+      if (from_userId === to_userId) {
+        console.log(`${from_name} (${from_userId}) joined the chat`);
         setIsConnected(true);
       }
     });
-    socket.on('leave_notify', (name) => {
-      if (name === to_name) {
-        console.log(name + ' left the chat');
+    socket.on('leave_notify', (from_userId, from_name) => {
+      if (from_userId === to_userId) {
+        console.log(`${from_name} (${from_userId}) left the chat`);
         setIsConnected(false);
       }
     });
   }, []);
 
+  // Notify others if user join or left the chat
+  useEffect(() => {
+    if (status === 1) {
+      socket.emit('join_notify', to_userId);
+    } else {
+      socket.emit('leave_notify', to_userId);
+    }
+  }, [status]);
+
   // Update chatListElements when chat changes
   useEffect(() => {
-    const all_chats = chat.map(({ name, message, color }, index) => (
+    const all_chats = chat.map(({ userId, name, color, message }, index) => (
       <div
         key={index}
-        className={`chat-bubble ${name === userState.name ? ' right' : ''}`}
+        className={`chat-bubble ${userId === userState.userId ? ' right' : ''}`}
       >
-        <p className='username' style={{ color: `${color}` }}>
-          {name}
+        <p className='name' style={{ color: `${color}` }}>
+          {name.length > 0 ? name : userId}
         </p>
         <p className='message'>{message}</p>
       </div>
     ));
     setChatListElements(all_chats);
-    setTimeout(() => {
-      var element = document.getElementById('chat-list-' + elementId);
-      element.scrollTop = element.scrollHeight;
-    }, 50);
   }, [chat]);
 
-  // Notify others if user join or left the chat
   useEffect(() => {
-    if (status === 1) {
-      socket.emit('join_notify', to_name, name);
-    } else {
-      socket.emit('leave_notify', to_name, name);
-    }
-  }, [status]);
+    var element = document.getElementById('chat-list-' + elementId);
+    element.scrollTop = element.scrollHeight;
+  }, [chatListElements]);
 
   // onChange
   const onChange = (e) => {
@@ -92,16 +106,15 @@ function ChatComponent({ socket, userState, to_name, status }) {
   // Handle message submit
   const onMessageSubmit = (e) => {
     e.preventDefault();
-    const nameText = name.trim();
     const messageText = message.trim();
-    if (nameText.length > 0) {
-      if (messageText.length > 0) {
-        socket.emit('private_message', to_name, name, message, color);
-        setMessage('');
-      }
-    } else {
-      alert('Please enter a name !');
+    // if (name.length > 0) {
+    if (messageText.length > 0) {
+      socket.emit('private_message', to_userId, message);
+      setMessage('');
     }
+    // } else {
+    //   alert('Please enter a name !');
+    // }
   };
 
   return (
@@ -112,7 +125,9 @@ function ChatComponent({ socket, userState, to_name, status }) {
       <div className='chat-box'>
         <div className='chat-list-container'>
           <div className='heading'>
-            <p>{to_name}</p>
+            <p>
+              {to_name} ({to_userId})
+            </p>
 
             <div className='details-box'>
               {isConnected ? (
@@ -138,7 +153,7 @@ function ChatComponent({ socket, userState, to_name, status }) {
               placeholder='Type a message...'
             />
             <button type='submit'>
-              <span class='material-icons'>send</span>
+              <span className='material-icons'>send</span>
             </button>
           </form>
         </div>
