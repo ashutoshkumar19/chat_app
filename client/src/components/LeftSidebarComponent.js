@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
+import Avatar from '../images/avatar.png';
+
 import CreateJoinRoom from './CreateJoinRoom.component';
 import UserListItem from './UserListItem.component';
-import { generateRandomColor } from './Functions';
 import RoomListItem from './RoomListItem.component';
 
 function LeftSidebarComponent({
@@ -10,21 +11,12 @@ function LeftSidebarComponent({
   userList,
   setUserList,
   userState,
-  setUserState,
-  privateList,
-  setPrivateList,
-  roomState,
-  setRoomState,
+  chatBoxList,
+  setChatBoxList,
+  roomList,
+  setRoomList,
 }) {
   const { userId, name, color } = userState;
-
-  const { createRoomId, joinRoomId } = roomState;
-
-  const [isNameForm, setIsNameForm] = useState(false);
-  const [formData, setFormData] = useState(name);
-
-  const [userListElements, setUserListElements] = useState('');
-  const [roomListElements, setRoomListElements] = useState('');
 
   const [isSidebarHidden, setIsSidebarHidden] = useState(false);
 
@@ -44,33 +36,6 @@ function LeftSidebarComponent({
     });
   }, []);
 
-  // Update userListElements when userList changes
-  useEffect(() => {
-    const elements = userList.map(
-      (user, index) =>
-        user.userId !== userId && (
-          <UserListItem
-            key={index}
-            user={user}
-            privateList={privateList}
-            setPrivateList={setPrivateList}
-          />
-        )
-    );
-    setUserListElements(elements);
-  }, [userList]);
-
-  // Handle name change
-  const onNameSubmit = (e) => {
-    e.preventDefault();
-    let name_text = formData.trim();
-    if (name_text !== name) {
-      setUserState({ ...userState, name: name_text, color: generateRandomColor() });
-    }
-    setIsNameForm(false);
-    setFormData(name_text);
-  };
-
   return (
     <div className={`left-sidebar ${isSidebarHidden && `hidden`}`}>
       <div
@@ -85,70 +50,56 @@ function LeftSidebarComponent({
       </div>
 
       <div className='current-user' id='current-user'>
-        {isNameForm ? (
-          <div className='name-box'>
-            <form onSubmit={onNameSubmit}>
-              <label htmlFor='name'>Name</label>
-              <input
-                type='text'
-                name='name'
-                autoFocus
-                value={formData}
-                onChange={(e) => setFormData(e.target.value)}
-              />
-              <button type='submit'>Done</button>
-            </form>
-          </div>
-        ) : (
-          <>
-            {name.length > 0 ? (
-              <div style={{ display: 'flex' }}>
-                <p className='name'>{name}</p>
-                <span className='link sm' onClick={(e) => setIsNameForm(true)}>
-                  Change Name
-                </span>
-              </div>
-            ) : (
-              <div className='name link' onClick={(e) => setIsNameForm(true)}>
-                Please enter your name
-              </div>
-            )}
-          </>
-        )}
-
-        <p className='userId'>
-          User Id: <span>{userId}</span>
-        </p>
+        <div className='avatar'>
+          <img src={Avatar} alt='' />
+        </div>
+        <div className='details'>
+          {name.length > 0 && (
+            <div style={{ display: 'flex' }}>
+              <p className='name' title={name}>
+                {name}
+              </p>
+            </div>
+          )}
+          <p className='userId'>
+            User Id: <span>{userId}</span>
+          </p>
+        </div>
       </div>
 
       <div className='btn-container' id='btn-container'>
         <CreateJoinRoom
           socket={socket}
           userState={userState}
-          setUserState={setUserState}
-          roomState={roomState}
-          setRoomState={setRoomState}
+          roomList={roomList}
+          setRoomList={setRoomList}
         />
       </div>
 
       <div className='user-list-container'>
         <p className='heading'>Online users and rooms</p>
         <ul className='user-list'>
-          {createRoomId.length > 0 && (
+          {roomList.map((room, index) => (
             <RoomListItem
-              roomId={createRoomId}
-              roomState={roomState}
-              setRoomState={setRoomState}
+              key={index}
+              room={room}
+              userState={userState}
+              chatBoxList={chatBoxList}
+              setChatBoxList={setChatBoxList}
             />
+          ))}
+
+          {userList.map(
+            (user, index) =>
+              user.userId !== userId && (
+                <UserListItem
+                  key={index}
+                  user={user}
+                  chatBoxList={chatBoxList}
+                  setChatBoxList={setChatBoxList}
+                />
+              )
           )}
-          {joinRoomId.length > 0 && (
-            <RoomListItem
-              roomId={joinRoomId}
-              roomState={roomState}
-              setRoomState={setRoomState}
-            />
-          )}
-          {userListElements}
         </ul>
       </div>
     </div>

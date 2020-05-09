@@ -3,10 +3,12 @@ import io from 'socket.io-client';
 
 import LeftSidebarComponent from './components/LeftSidebarComponent';
 import ChatComponent from './components/ChatComponent';
+import ChatRoomComponent from './components/ChatRoomComponent';
 
 import { generateUserId, generateRandomColor } from './components/Functions';
 
 import './styles/App.scss';
+import LandingComponent from './components/LandingComponent';
 
 // const socket = io.connect('http://localhost:5000');
 const socket = io.connect('/');
@@ -20,37 +22,61 @@ function App() {
 
   const [userList, setUserList] = useState([]);
 
-  const [privateList, setPrivateList] = useState([]);
-
   const [roomList, setRoomList] = useState([]);
 
-  const [roomState, setRoomState] = useState({ createRoomId: '', joinRoomId: '' });
+  const [chatBoxList, setChatBoxList] = useState([]);
 
   useEffect(() => {
     console.log('***********************');
-    console.log(privateList);
+    console.log(chatBoxList);
     console.log('***********************');
-  }, [privateList]);
+  }, [chatBoxList]);
 
   return (
-    <Fragment>
-      <LeftSidebarComponent
-        socket={socket}
-        userList={userList}
-        setUserList={setUserList}
-        userState={userState}
-        setUserState={setUserState}
-        privateList={privateList}
-        setPrivateList={setPrivateList}
-        roomState={roomState}
-        setRoomState={setRoomState}
-      />
+    <div className='main-content'>
+      {userState.name.length === 0 ? (
+        <LandingComponent userState={userState} setUserState={setUserState} />
+      ) : (
+        <Fragment>
+          <LeftSidebarComponent
+            socket={socket}
+            userList={userList}
+            setUserList={setUserList}
+            userState={userState}
+            chatBoxList={chatBoxList}
+            setChatBoxList={setChatBoxList}
+            roomList={roomList}
+            setRoomList={setRoomList}
+          />
 
-      {privateList.map((item, index) => (
-        <ChatComponent key={index} socket={socket} userState={userState} to_user={item} />
-      ))}
-      {/* <ChatComponent socket={socket} userState={userState} setUserState={setUserState} /> */}
-    </Fragment>
+          {chatBoxList.map((item, index) => {
+            if (item.type === 'room') {
+              let currentRoom = roomList.find((room) => room.roomId === item.id);
+              return (
+                <ChatRoomComponent
+                  key={index}
+                  socket={socket}
+                  userState={userState}
+                  chatBoxItem={item}
+                  currentRoom={currentRoom}
+                  setRoomList={setRoomList}
+                  setChatBoxList={setChatBoxList}
+                />
+              );
+            } else {
+              return (
+                <ChatComponent
+                  key={index}
+                  socket={socket}
+                  userState={userState}
+                  chatBoxItem={item}
+                />
+              );
+            }
+          })}
+        </Fragment>
+      )}
+    </div>
   );
 }
 

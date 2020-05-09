@@ -1,52 +1,72 @@
 import React, { useState, useEffect } from 'react';
 
-function RoomListItem({ roomId, roomState, setRoomState }) {
-  {
-    /*const openChatWindow = () => {
-    var userExists = privateList.some((item) => {
-      if (item.name === user.name) {
+import GroupIcon from '../images/group.png';
+
+function RoomListItem({ room, userState, chatBoxList, setChatBoxList }) {
+  const [currentItemStatus, setCurrentItemStatus] = useState(0);
+
+  useEffect(() => {
+    try {
+      const index = chatBoxList.findIndex((item) => item.id === room.roomId);
+      const currentStatus = chatBoxList[index].status;
+      setCurrentItemStatus(currentStatus);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [chatBoxList]);
+
+  // Open chat box
+  const openChatWindow = () => {
+    var roomExists = chatBoxList.some((item) => {
+      if (item.id === room.roomId) {
         return true;
       }
     });
-    let temp = privateList;
-    if (userExists) {
-      const userIndex = privateList.findIndex((element) => element.name === user.name);
-      const statusIndex = privateList.findIndex((element) => element.status === 1);
+    let temp = chatBoxList;
+    if (roomExists) {
+      const roomIndex = chatBoxList.findIndex((item) => item.id === room.roomId);
+      const statusIndex = chatBoxList.findIndex((item) => item.status === 1);
+
+      const currentStatus = temp[roomIndex].status;
 
       temp[statusIndex] = {
         ...temp[statusIndex],
         status: 0,
       };
-      temp[userIndex] = {
-        ...temp[userIndex],
-        status: 1,
+      temp[roomIndex] = {
+        ...temp[roomIndex],
+        name: room.roomId,
+        status: currentStatus === 0 ? 1 : 0,
       };
     } else {
-      const statusIndex = privateList.findIndex((element) => element.status === 1);
+      const statusIndex = chatBoxList.findIndex((item) => item.status === 1);
       if (statusIndex >= 0) {
         temp[statusIndex] = {
           ...temp[statusIndex],
           status: 0,
         };
       }
-      temp.push({ name: user.name, status: 1 });
+      temp.push({ id: room.roomId, name: room.roomId, type: 'room', status: 1 });
     }
-    setPrivateList(temp);
-    setPrivateList((prevList) => [...prevList]);
-  };*/
-  }
+    setChatBoxList(temp);
+    setChatBoxList((prevList) => [...prevList]);
+  };
 
   return (
-    // <li className='user-list-item' onClick={(e) => openChatWindow()}>
-    <li className='room-list-item'>
+    <li
+      className={`room-list-item ${currentItemStatus === 1 && `active`}`}
+      onClick={(e) => openChatWindow()}
+    >
       <div className='img-div'>
-        <img
-          src='https://viewsgain.com/wp-content/uploads/2018/08/Buy-Youtube-Subscribers.png'
-          alt=''
-        />
+        <img src={GroupIcon} alt='' />
       </div>
       <div className='name-div'>
-        <p>{roomId}</p>
+        <p>{room.roomId}</p>
+        {room.host.userId === userState.userId && (
+          <span className='material-icons host' title='Host'>
+            account_circle
+          </span>
+        )}
       </div>
       <div className='status-div'>
         <div className='status-color'></div>

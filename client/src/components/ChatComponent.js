@@ -4,12 +4,12 @@ import { generateUserId } from './Functions';
 
 const elementId = generateUserId(5);
 
-function ChatComponent({ socket, userState, to_user }) {
+function ChatComponent({ socket, userState, chatBoxItem }) {
   const { userId, name, color } = userState;
 
-  const to_userId = to_user.userId;
-  const to_name = to_user.name;
-  const status = to_user.status;
+  const to_userId = chatBoxItem.id;
+  const to_name = chatBoxItem.name;
+  const status = chatBoxItem.status;
 
   const [message, setMessage] = useState('');
 
@@ -107,14 +107,11 @@ function ChatComponent({ socket, userState, to_user }) {
   const onMessageSubmit = (e) => {
     e.preventDefault();
     const messageText = message.trim();
-    // if (name.length > 0) {
     if (messageText.length > 0) {
       socket.emit('private_message', to_userId, message);
       setMessage('');
     }
-    // } else {
-    //   alert('Please enter a name !');
-    // }
+    document.getElementById('message-input-' + elementId).focus();
   };
 
   return (
@@ -131,9 +128,9 @@ function ChatComponent({ socket, userState, to_user }) {
 
             <div className='details-box'>
               {isConnected ? (
-                <p className='joined'>Joined the chat</p>
+                <p className='joined'>Joined</p>
               ) : (
-                <p className='left'>Left the chat</p>
+                <p className='left'>Left</p>
               )}
             </div>
           </div>
@@ -146,6 +143,7 @@ function ChatComponent({ socket, userState, to_user }) {
         <div className='chat-form'>
           <form onSubmit={onMessageSubmit}>
             <input
+              id={`message-input-` + elementId}
               type='text'
               name='message'
               value={message}

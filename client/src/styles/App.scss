@@ -4,6 +4,7 @@
 .btn {
   border: none;
   outline: none;
+  height: fit-content;
   padding: 10px 12px;
   border-radius: 4px;
   font-size: 12pt;
@@ -17,8 +18,8 @@
   transition: all 200ms;
 }
 .btn-sm {
-  font-size: 11pt;
-  padding: 5px 8px;
+  font-size: 11pt !important;
+  padding: 5px 8px !important;
 }
 .btn-lg {
   font-size: 14pt;
@@ -89,6 +90,90 @@
   }
 }
 
+.btn-outline {
+  outline: none;
+  height: fit-content;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 12pt;
+  text-decoration: none;
+  border: 1px solid #2e2e2e;
+  color: #2e2e2e;
+  background-color: #ffffff;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-select: none;
+  transition: all 200ms;
+}
+.btn-outline-primary {
+  border: 1px solid #007bff;
+  color: #007bff;
+  background-color: transparent;
+  &:active,
+  &:hover {
+    color: #fff;
+    opacity: 1;
+    background-color: #007bff;
+    box-shadow: none;
+  }
+}
+.btn-outline-dark {
+  border: 1px solid #2e2e2e;
+  color: #2e2e2e;
+  background-color: transparent;
+  &:active,
+  &:hover {
+    color: #fff;
+    opacity: 1;
+    background-color: #2e2e2e;
+    box-shadow: none;
+  }
+}
+.btn-outline-success {
+  border: 1px solid #218338;
+  color: #218338;
+  background-color: transparent;
+  &:active,
+  &:hover {
+    color: #fff;
+    opacity: 1;
+    background-color: #218338;
+    box-shadow: none;
+  }
+}
+.btn-outline-danger {
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  background-color: transparent;
+  &:active,
+  &:hover {
+    color: #fff;
+    opacity: 1;
+    background-color: #dc3545;
+    box-shadow: none;
+  }
+}
+.btn-outline-warning {
+  border: 1px solid #c59400;
+  color: #c59400;
+  background-color: transparent;
+  &:active,
+  &:hover {
+    color: #fff;
+    opacity: 1;
+    background-color: #c59400;
+    box-shadow: none;
+  }
+}
+
+.main-content {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  overflow-y: hidden;
+}
+
 // Left Sidebar
 .left-sidebar {
   min-width: 275px;
@@ -129,79 +214,40 @@
 
   .current-user {
     background-color: #f0f0f0;
+    padding: 10px;
     // height: 75px;
+    display: flex;
 
-    .name {
-      padding: 10px 10px 5px;
-
-      font-size: 20px;
-      font-weight: bold;
-      color: #000;
-    }
-    .link {
-      font-size: 16px;
-      color: #0077ff;
-      cursor: pointer;
-      &.sm {
-        font-size: 12px;
-        position: absolute;
-        margin-top: 45px;
-        margin-left: 190px;
-      }
-      &:hover {
-        text-decoration: underline;
+    .avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: auto;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: scale-down;
       }
     }
-    .userId {
-      padding: 5px 10px;
-      font-size: 14px;
-      color: #000;
-      span {
+
+    .details {
+      width: 70%;
+      margin: auto auto auto 10px;
+      cursor: default;
+      .name {
+        padding: 5px 0;
+        font-size: 20px;
         font-weight: bold;
+        color: #000;
+        overflow-x: hidden;
       }
-    }
 
-    .name-box {
-      padding: 10px 10px 5px;
-      form {
-        label {
-          font-size: 14px;
-          margin-right: 5px;
-          color: #000000;
-        }
-        input {
-          width: 150px;
-          outline: none;
-          border-radius: 3px;
-          border: none;
-          border: 1px solid #e0e0e0;
-          padding: 2px 5px;
-          font-size: 15px;
-          transition: ease-in-out 250ms;
-
-          &:active,
-          &:focus {
-            box-shadow: 0 0 0 1px orange;
-          }
-        }
-        button {
-          // width: 50px;
-          outline: none;
-          border: none;
-          margin-left: 3px;
-          padding: 4px 5px;
-          background-color: #008eec;
-          color: #fafafa;
-          font-size: 12px;
-          border-radius: 5px;
-          transition: ease-in-out 250ms;
-          cursor: pointer;
-
-          &:hover,
-          &:active,
-          &:focus {
-            background-color: #006ab1;
-          }
+      .userId {
+        font-size: 14px;
+        color: #000;
+        span {
+          font-weight: bold;
         }
       }
     }
@@ -261,18 +307,16 @@
 
       .user-list-item {
         padding: 5px;
-        border-bottom: 1px solid #f0f0f0;
         display: flex;
         cursor: pointer;
         user-select: none;
 
-        &.active {
-          background-color: yellow;
+        &:hover {
+          background-color: #f0f0f0;
         }
 
-        &:hover {
-          background-color: #ffffff;
-          box-shadow: 2px 0px 8px 0 #cecece;
+        &.active {
+          background-color: #e5e5e5 !important;
           .name-div p {
             color: rgb(0, 141, 141);
             font-weight: bold;
@@ -321,8 +365,11 @@
         cursor: pointer;
 
         &:hover {
-          background-color: #ffffff;
-          box-shadow: 2px 0px 8px 0 #cecece;
+          background-color: #f0f0f0;
+        }
+
+        &.active {
+          background-color: #e5e5e5 !important;
           .name-div p {
             color: rgb(0, 141, 141);
             font-weight: bold;
@@ -345,8 +392,14 @@
         .name-div {
           width: calc(100% - 50px);
           padding: 10px 10px;
+          display: flex;
           p {
-            margin-top: auto;
+            margin: auto 0;
+          }
+          .host {
+            margin: auto 10px;
+            color: rgba(0, 154, 214, 0.863);
+            font-size: 22px;
           }
         }
 
@@ -367,8 +420,9 @@
   }
 }
 
+// Chat box
 .chat-box-container {
-  height: 100vh;
+  height: 100%;
   width: 100%;
 
   .chat-box {
@@ -380,7 +434,8 @@
     transform: translateX(-50%);
 
     .chat-list-container {
-      height: calc(100% - 45px);
+      // height: calc(100vh - 50px);
+      height: 100%;
       width: 100%;
 
       .heading {
@@ -402,10 +457,6 @@
           margin-left: auto;
           margin-right: 5px;
 
-          .detail {
-            font-size: 16px;
-            color: #fafafa;
-          }
           .joined {
             font-size: 16px;
             color: #02df02;
@@ -414,11 +465,15 @@
             font-size: 16px;
             color: #ff5448;
           }
+          button {
+            margin-left: 5px;
+            font-size: 13px !important;
+          }
         }
       }
 
       .chat-list {
-        padding: 5px 15px;
+        padding: 5px 15px 100px 15px;
         height: calc(100% - 30px);
         background-color: #ffffff;
         // background-image: url('https://bgfons.com/uploads/pattern/pattern_texture1165.jpg');
@@ -455,19 +510,37 @@
             margin-left: auto;
           }
         }
+        .notification-bubble {
+          width: fit-content;
+          max-width: 60%;
+          margin: 12px auto;
+          padding: 4px 6px;
+          word-wrap: break-word;
+          background-color: #d4eaf4;
+          border-radius: 5px;
+
+          .notification-text {
+            font-size: 12px;
+            color: #4e4e4e !important;
+          }
+        }
       }
     }
 
     .chat-form {
-      height: 45px;
+      height: 50px;
       line-height: 45px;
       vertical-align: middle;
       background-color: #2e2e2e;
       z-index: 100;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
 
       form {
+        margin: 0px auto;
         width: 100%;
-        padding: 0 10px;
+        padding: 0 8px;
         display: flex;
         height: 100%;
 
@@ -481,7 +554,7 @@
           border: 1px solid #e0e0e0;
           border-radius: 5px;
           padding: 5px 10px;
-          font-size: 16px;
+          font-size: 18px;
           transition: ease-in-out 250ms;
 
           &:active,
@@ -505,6 +578,11 @@
           border-radius: 5px;
           transition: ease-in-out 250ms;
           cursor: pointer;
+          user-select: none;
+
+          span {
+            user-select: none;
+          }
 
           &:hover,
           &:active,
@@ -513,6 +591,91 @@
           }
         }
       }
+    }
+  }
+}
+
+// User list modal
+.modal-container {
+  position: fixed;
+  float: left;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(27, 27, 27, 0.774);
+  z-index: 100;
+
+  .modal {
+    position: relative;
+    min-width: 300px;
+    width: fit-content;
+    background-color: #fff;
+    color: #000;
+    margin: auto;
+    margin-top: 50px;
+    border-radius: 10px;
+    overflow: hidden;
+
+    .close {
+      position: absolute;
+      right: 0;
+      margin: 5px;
+      font-size: 28px;
+      transition: ease-in-out 250px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #aeaeae;
+        border-radius: 25px;
+      }
+    }
+
+    .modal-header {
+      padding: 5px 10px;
+      background-color: #e0e0e0;
+      font-weight: bold;
+    }
+    .modal-body {
+      background-color: #fafafa;
+      max-height: 400px;
+      overflow-y: auto;
+
+      .user-item {
+        display: flex;
+        padding: 2px 10px;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:hover {
+          background-color: #f0f0f0;
+        }
+        .name {
+          padding: 2px;
+          padding-right: 10px;
+        }
+        button {
+          margin: auto 0 auto auto;
+          margin-left: auto !important;
+        }
+        .host {
+          font-weight: bold;
+          color: #007bff;
+        }
+        .host-badge {
+          margin: auto 0 auto auto;
+          color: green;
+          padding: 0 10px;
+          border-radius: 10px;
+          line-height: 28px;
+          font-size: 14px;
+          background-color: #c4fcc8;
+          user-select: none;
+        }
+        .current {
+          font-weight: bold;
+        }
+      }
+    }
+    .modal-footer {
     }
   }
 }

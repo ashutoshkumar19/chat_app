@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from 'react';
 
-function UserListItem({ user, privateList, setPrivateList }) {
+import UserIcon from '../images/user.png';
+
+function UserListItem({ user, chatBoxList, setChatBoxList }) {
+  const [currentItemStatus, setCurrentItemStatus] = useState(0);
+
+  useEffect(() => {
+    try {
+      const index = chatBoxList.findIndex((item) => item.id === user.userId);
+      const currentStatus = chatBoxList[index].status;
+      setCurrentItemStatus(currentStatus);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [chatBoxList]);
+
   // Open chat box
   const openChatWindow = () => {
-    var userExists = privateList.some((item) => {
-      if (item.userId === user.userId) {
+    var userExists = chatBoxList.some((item) => {
+      if (item.id === user.userId) {
         return true;
       }
     });
-    let temp = privateList;
+    let temp = chatBoxList;
     if (userExists) {
-      const userIndex = privateList.findIndex(
-        (element) => element.userId === user.userId
-      );
-      const statusIndex = privateList.findIndex((element) => element.status === 1);
+      const userIndex = chatBoxList.findIndex((item) => item.id === user.userId);
+      const statusIndex = chatBoxList.findIndex((item) => item.status === 1);
+
+      const currentStatus = temp[userIndex].status;
 
       temp[statusIndex] = {
         ...temp[statusIndex],
@@ -22,29 +36,29 @@ function UserListItem({ user, privateList, setPrivateList }) {
       temp[userIndex] = {
         ...temp[userIndex],
         name: user.name,
-        status: 1,
+        status: currentStatus === 0 ? 1 : 0,
       };
     } else {
-      const statusIndex = privateList.findIndex((element) => element.status === 1);
+      const statusIndex = chatBoxList.findIndex((item) => item.status === 1);
       if (statusIndex >= 0) {
         temp[statusIndex] = {
           ...temp[statusIndex],
           status: 0,
         };
       }
-      temp.push({ userId: user.userId, name: user.name, status: 1 });
+      temp.push({ id: user.userId, name: user.name, type: 'private', status: 1 });
     }
-    setPrivateList(temp);
-    setPrivateList((prevList) => [...prevList]);
+    setChatBoxList(temp);
+    setChatBoxList((prevList) => [...prevList]);
   };
 
   return (
-    <li className='user-list-item' onClick={(e) => openChatWindow()}>
+    <li
+      className={`user-list-item ${currentItemStatus === 1 && `active`}`}
+      onClick={(e) => openChatWindow()}
+    >
       <div className='img-div'>
-        <img
-          src='https://www.nicepng.com/png/detail/780-7805650_generic-user-image-male-man-cartoon-no-eyes.png'
-          alt=''
-        />
+        <img src={UserIcon} alt='' />
       </div>
       <div className='name-div'>
         <p>{user.name ? user.name : user.userId}</p>

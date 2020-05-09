@@ -1,22 +1,45 @@
 import React, { useState, Fragment, useEffect } from 'react';
 
-import { generateRoomId } from './Functions';
-
-function CreateJoinRoom({ socket, userState, setUserState, roomState, setRoomState }) {
+function CreateJoinRoom({ socket, userState, roomList, setRoomList }) {
   const { userId, name, color } = userState;
-
-  const { createRoomId, joinRoomId } = roomState;
 
   const [showForm, setShowForm] = useState(false);
 
   const [formData, setFormData] = useState('');
 
   useEffect(() => {
-    console.log('createRoomId: ' + createRoomId);
-  }, [createRoomId]);
+    socket.on('room_created', (room) => {
+      setRoomList((prevState) => [room, ...prevState]);
+    });
+
+    socket.on('room_joined', (roomId, joinedUserId, joinedUserName, room) => {
+      if (joinedUserId === userId) {
+        setRoomList((prevState) => [room, ...prevState]);
+      } else {
+        setRoomList((prevState) => {
+          let roomIndex = prevState.findIndex((roomItem) => roomItem.roomId === roomId);
+          const userExists = prevState[roomIndex].participants.some(
+            (user) => user.userId === joinedUserId
+          );
+          if (!userExists) {
+            prevState[roomIndex].participants.push({
+              userId: joinedUserId,
+              name: joinedUserName,
+            });
+          }
+          console.log(prevState);
+
+          return prevState;
+        });
+        console.log(joinedUserId + ' joined ' + roomId);
+      }
+    });
+  }, []);
+
   useEffect(() => {
-    console.log('joinRoomId: ' + joinRoomId);
-  }, [joinRoomId]);
+    console.log('Rooms : ');
+    console.log(roomList);
+  }, [roomList]);
 
   const onChange = (e) => {
     setFormData(e.target.value.trim());
@@ -25,11 +48,11 @@ function CreateJoinRoom({ socket, userState, setUserState, roomState, setRoomSta
   const joinRoom = (e) => {
     e.preventDefault();
     socket.emit('join_room', formData);
-    setRoomState({ ...roomState, joinRoomId: formData });
     setFormData('');
+    setShowForm(false);
     // if (window.confirm('Are you sure? You will be exited from current room!')) {
     //   try {
-    //     setRoomState({ ...roomState, joinRoomId: formData });
+    //     setRoomList({ ...roomList, joinRoomId: formData });
     //     setFormData('');
     //   } catch (error) {
     //     console.log(error);
@@ -39,9 +62,7 @@ function CreateJoinRoom({ socket, userState, setUserState, roomState, setRoomSta
 
   const createRoom = (e) => {
     e.preventDefault();
-    let roomId = generateRoomId(10);
-    socket.emit('create_room', roomId);
-    setRoomState({ ...roomState, createRoomId: roomId });
+    socket.emit('create_room');
     if (showForm) {
       setShowForm(false);
     }

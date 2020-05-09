@@ -3,58 +3,14 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
+const functions = require('./Functions');
+
 users = [];
 socketList = {};
 
 rooms = {};
 
 io.on('connection', (socket) => {
-  // Create room
-  socket.on('create_room', (roomId) => {
-    try {
-      if (roomId.length > 0 && socket.userId !== undefined) {
-        socket.join(roomId);
-
-        var temp = {
-          host: socket.userId,
-          participants: [],
-        };
-        rooms[roomId] = temp;
-
-        console.log(`\nRoom ${roomId} created...`);
-        console.log(rooms);
-
-        // var temp = {
-        //   roomId: roomId,
-        //   host: socket.userId,
-        //   participants: [],
-        // };
-        // rooms.push(temp);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  // Create room
-  socket.on('join_room', (roomId) => {
-    try {
-      if (
-        rooms[roomId].host !== socket.userId &&
-        !rooms[roomId].participants.includes(socket.userId)
-      ) {
-        socket.join(roomId);
-
-        rooms[roomId].participants.push(socket.userId);
-
-        console.log(`\n${socket.userId} joined room ${roomId}...`);
-        console.log(rooms[roomId]);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
   // Add new users and their sockets
   socket.on('new_user', (userId, name, color) => {
     try {
@@ -88,24 +44,23 @@ io.on('connection', (socket) => {
       socket.name = name;
       socket.color = color;
 
+      updateUsernames();
+
       console.log('\nName Changed...');
       console.log(users);
-      // console.log('Socket.Name: ' + socket.name + '\nSocket.color: ' + socket.color);
-
-      updateUsernames();
     } catch (error) {
       console.log(error);
     }
   });
 
-  // Update Usernames on clients
+  // Update name on clients
   const updateUsernames = () => {
     io.emit('get_users', users);
   };
 
-  socket.on('message', (name, message, color) => {
-    io.emit('message', name, message, color);
-  });
+  /**************************************************/
+  /*                Private Chats                   */
+  /**************************************************/
 
   // Send private message to specified client
   socket.on('private_message', (to_userId, message) => {
@@ -153,12 +108,201 @@ io.on('connection', (socket) => {
     }
   });
 
+  /**************************************************/
+  /*                 Chat Rooms                     */
+  /**************************************************/
+
+  // Create room
+  socket.on('create_room', () => {
+    try {
+      if (socket.userId !== undefined) {
+        const roomId = functions.generateRoomId(7);
+
+        socket.join(roomId);
+
+        let room = {
+          host: { userId: socket.userId, name: socket.name },
+          participants: [],
+        };
+        rooms[roomId] = room;
+
+        room = { roomId: roomId, ...room };
+        console.log(room);
+
+        socket.emit('room_created', room);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // Join room
+  socket.on('join_room', (roomId) => {
+    try {
+      if (rooms[roomId] !== undefined) {
+        var userExists = rooms[roomId].participants.some(
+          (participant) => participant.userId === socket.userId
+        );
+        if (rooms[roomId].host.userId !== socket.userId && !userExists) {
+          socket.join(roomId);
+
+          rooms[roomId].participants.push({ userId: socket.userId, name: socket.name });
+
+          let room = rooms[roomId];
+          room = { roomId: roomId, ...room };
+
+          io.to(roomId).emit('room_joined', roomId, socket.userId, socket.name, room);
+
+          io.to(roomId).emit(
+            'join_room_notify',
+            roomId,
+            socket.userId,
+            socket.name,
+            'joined the room'
+          );
+
+          console.log(`\n${socket.userId} joined room ${roomId}...`);
+          console.log(room);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // Close room
+  socket.on('close_room', (roomId) => {
+    try {
+      if (rooms[roomId].host.userId === socket.userId) {
+        io.to(roomId).emit('room_closed', roomId);
+
+        rooms[roomId].participants.map((participant) => {
+          socketList[participant.userId].leave(roomId);
+        });
+
+        socket.leave(roomId);
+
+        delete rooms[roomId];
+
+        console.log(rooms);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // Leave room
+  socket.on('leave_room', (roomId, userId) => {
+    try {
+      let temp = rooms[roomId].participants.filter((item) => item.userId !== userId);
+      rooms[roomId].participants = temp;
+
+      io.to(roomId).emit('left_room', roomId, userId);
+
+      socketList[userId].leave(roomId);
+
+      console.log('\n~~~~~~~~~~User Left the Room~~~~~~~~~~~~~~');
+      console.log(rooms[roomId]);
+      console.log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // Send message to specified room
+  socket.on('room_message', (roomId, message) => {
+    try {
+      // socket.emit('sent_room_message', roomId, socket.name, socket.color, message);
+      io.to(roomId).emit(
+        'room_message',
+        roomId,
+        socket.userId,
+        socket.name,
+        socket.color,
+        message
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // Notify in room when someone joins the chat
+  socket.on('join_room_notify', (roomId, notify_text) => {
+    try {
+      io.to(roomId).emit(
+        'join_room_notify',
+        roomId,
+        socket.userId,
+        socket.name,
+        notify_text
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  // Acknowledge to room that other client received the notification
+  socket.on('join_room_notify_acknowledge', (roomId, notify_text) => {
+    try {
+      io.to(roomId).emit(
+        'join_room_notify_acknowledge',
+        roomId,
+        socket.userId,
+        socket.name,
+        notify_text
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // Notify in room when someone leaves the chat
+  socket.on('leave_room_notify', (roomId, notify_text) => {
+    try {
+      io.to(roomId).emit(
+        'leave_room_notify',
+        roomId,
+        socket.userId,
+        socket.name,
+        notify_text
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // Remove socket from all rooms
+  const removeSocketFromRooms = (socket) => {
+    try {
+      for (let i = 0; i < Object.keys(rooms).length; i++) {
+        let roomId = Object.keys(rooms)[i];
+        if (rooms[roomId].host.userId === socket.userId) {
+          io.to(roomId).emit('room_closed', roomId);
+          rooms[roomId].participants.map((participant) => {
+            socketList[participant.userId].leave(roomId);
+          });
+          socket.leave(roomId);
+        } else {
+          rooms[roomId].participants.map((participant, index) => {
+            if (participant.userId === socket.userId) {
+              rooms[roomId].participants.splice(index, 1);
+              io.to(roomId).emit('left_room', roomId, socket.userId);
+              socketList[socket.userId].leave(roomId);
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // Remove socket on server
   const removeSocket = (socket) => {
     try {
       users = users.filter((user) => user.userId !== socket.userId);
       delete socketList[socket.userId];
       io.emit('leave_notify', socket.userId, socket.name);
+      updateUsernames();
       console.log(`\n${socket.name} (${socket.userId}) disconnected`);
     } catch (error) {
       console.log(error);
@@ -167,6 +311,7 @@ io.on('connection', (socket) => {
 
   // Remove socket when client disconnects
   socket.on('disconnect', (data) => {
+    removeSocketFromRooms(socket);
     removeSocket(socket);
   });
 });
