@@ -210,7 +210,7 @@ function ChatRoomComponent({
       <div className='chat-box'>
         <div className='chat-list-container'>
           <div className='heading'>
-            <p>Room ID: {roomId}</p>
+            <p>RoomID: {roomId}</p>
 
             <div className='details-box'>
               <button

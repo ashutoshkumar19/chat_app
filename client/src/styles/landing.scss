@@ -1,15 +1,64 @@
+.navbar {
+  width: 100%;
+  background-color: #1e1e1e;
+  height: fit-content;
+  color: #fff;
+  display: flex;
+  box-shadow: 0 2px 25px 0 #3e3e3e;
+
+  .brand {
+    width: fit-content;
+    margin: auto auto auto 0;
+    font-size: 32px;
+    padding: 15px 25px;
+    transition: ease-in-out 300ms;
+    user-select: none;
+    cursor: pointer;
+  }
+  .right {
+    width: fit-content;
+    height: 100%;
+    margin: auto 15px auto auto;
+    padding: 10px;
+    display: flex;
+    transition: ease-in-out 300ms;
+    user-select: none;
+    cursor: pointer;
+
+    .plus {
+      font-size: 42px;
+      margin: auto;
+      padding: 0 12px;
+      height: 100%;
+    }
+
+    .img-container {
+      width: 65px;
+      height: 65px;
+      transition: ease-in-out 300ms;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: scale-down;
+      }
+    }
+  }
+}
+
 .container {
   width: fit-content;
   max-width: 90%;
   padding: 25px;
   color: #fff;
-  background-color: #2e2e2e;
+  background-color: #1e1e1e;
   border-radius: 25px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 25px 0 #4e4e4e;
+  box-shadow: 0 0 25px 0 #3e3e3e;
+  transition: ease-in-out 300ms;
 
   .label {
     font-size: 28px;
@@ -63,6 +112,32 @@
       &:focus {
         background-color: #0065d1;
       }
+    }
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .navbar {
+    .brand {
+      padding: 15px 10px;
+      font-size: 24px;
+    }
+    .right {
+      padding: 0 5px;
+      .plus {
+        padding: 0 5px;
+        font-size: 16px;
+      }
+      .img-container {
+        width: 35px;
+        height: 35px;
+      }
+    }
+  }
+
+  .container {
+    .label {
+      font-size: 22px;
     }
   }
 }
