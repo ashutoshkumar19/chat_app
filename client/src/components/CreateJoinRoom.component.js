@@ -86,6 +86,7 @@ function CreateJoinRoom({ socket, userState, roomList, setRoomList }) {
               name='joinRoomId'
               placeholder='Enter room id'
               autoFocus
+              autocomplete='off'
               value={formData}
               onChange={onChange}
             />

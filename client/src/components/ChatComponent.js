@@ -149,6 +149,8 @@ function ChatComponent({ socket, userState, chatBoxItem }) {
               value={message}
               onChange={(e) => onChange(e)}
               placeholder='Type a message...'
+              autocomplete='off'
+              autoFocus
             />
             <button type='submit'>
               <span className='material-icons'>send</span>

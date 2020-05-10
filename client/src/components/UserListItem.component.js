@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import UserIcon from '../images/user.png';
 
-function UserListItem({ user, chatBoxList, setChatBoxList }) {
+function UserListItem({ user, chatBoxList, setChatBoxList, setIsSidebarHidden }) {
   const [currentItemStatus, setCurrentItemStatus] = useState(0);
 
   useEffect(() => {
@@ -10,6 +10,9 @@ function UserListItem({ user, chatBoxList, setChatBoxList }) {
       const index = chatBoxList.findIndex((item) => item.id === user.userId);
       const currentStatus = chatBoxList[index].status;
       setCurrentItemStatus(currentStatus);
+      if (currentStatus) {
+        setIsSidebarHidden(true);
+      }
     } catch (error) {
       console.log(error);
     }

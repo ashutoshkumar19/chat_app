@@ -217,7 +217,7 @@ function ChatRoomComponent({
                 className='btn-outline btn-sm btn-outline-primary'
                 onClick={(e) => setOpen(true)}
               >
-                View all users
+                View Users
               </button>
               {open && (
                 <UserListModal
@@ -259,6 +259,8 @@ function ChatRoomComponent({
               value={message}
               onChange={(e) => onChange(e)}
               placeholder='Type a message...'
+              autocomplete='off'
+              autoFocus
             />
             <button type='submit'>
               <span className='material-icons'>send</span>

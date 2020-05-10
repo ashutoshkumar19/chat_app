@@ -78,6 +78,7 @@ function LeftSidebarComponent({
 
       <div className='user-list-container'>
         <p className='heading'>Online users and rooms</p>
+
         <ul className='user-list'>
           {roomList.map((room, index) => (
             <RoomListItem
@@ -86,6 +87,7 @@ function LeftSidebarComponent({
               userState={userState}
               chatBoxList={chatBoxList}
               setChatBoxList={setChatBoxList}
+              setIsSidebarHidden={setIsSidebarHidden}
             />
           ))}
 
@@ -97,6 +99,7 @@ function LeftSidebarComponent({
                   user={user}
                   chatBoxList={chatBoxList}
                   setChatBoxList={setChatBoxList}
+                  setIsSidebarHidden={setIsSidebarHidden}
                 />
               )
           )}

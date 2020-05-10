@@ -2,14 +2,25 @@ import React, { useState, useEffect } from 'react';
 
 import GroupIcon from '../images/group.png';
 
-function RoomListItem({ room, userState, chatBoxList, setChatBoxList }) {
+function RoomListItem({
+  room,
+  userState,
+  chatBoxList,
+  setChatBoxList,
+  setIsSidebarHidden,
+}) {
   const [currentItemStatus, setCurrentItemStatus] = useState(0);
+
+  const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
     try {
       const index = chatBoxList.findIndex((item) => item.id === room.roomId);
       const currentStatus = chatBoxList[index].status;
       setCurrentItemStatus(currentStatus);
+      if (currentStatus) {
+        setIsSidebarHidden(true);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -52,6 +63,20 @@ function RoomListItem({ room, userState, chatBoxList, setChatBoxList }) {
     setChatBoxList((prevList) => [...prevList]);
   };
 
+  const copyToClipboard = (e) => {
+    e.stopPropagation();
+    var range = document.createRange();
+    range.selectNode(document.getElementById(`roomId-` + room.roomId));
+    window.getSelection().removeAllRanges(); // clear current selection
+    window.getSelection().addRange(range); // to select text
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges(); // to deselect
+    setShowTooltip(true);
+    setTimeout(() => {
+      setShowTooltip(false);
+    }, 1000);
+  };
+
   return (
     <li
       className={`room-list-item ${currentItemStatus === 1 && `active`}`}
@@ -60,17 +85,27 @@ function RoomListItem({ room, userState, chatBoxList, setChatBoxList }) {
       <div className='img-div'>
         <img src={GroupIcon} alt='' />
       </div>
+
+      {room.host.userId === userState.userId && <div className='host'>Host</div>}
+
       <div className='name-div'>
-        <p>{room.roomId}</p>
+        <p id={`roomId-` + room.roomId}>{room.roomId}</p>
+      </div>
+
+      <div className='status-div'>
         {room.host.userId === userState.userId && (
-          <span className='material-icons host' title='Host'>
-            account_circle
+          <span
+            class='material-icons copy-btn'
+            title='Copy RoomID'
+            onClick={(e) => copyToClipboard(e)}
+          >
+            file_copy
           </span>
         )}
-      </div>
-      <div className='status-div'>
         <div className='status-color'></div>
       </div>
+
+      {showTooltip && <div className='tooltip'>RoomID copied to clipboard</div>}
     </li>
   );
 }
