@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { generateUserId } from './Functions';
 
-const elementId = generateUserId(5);
+// const elementId = generateUserId(5);
 
 function ChatComponent({ socket, userState, chatBoxItem }) {
   const { userId, name, color } = userState;
@@ -18,6 +18,8 @@ function ChatComponent({ socket, userState, chatBoxItem }) {
   const [chatListElements, setChatListElements] = useState('');
 
   const [isConnected, setIsConnected] = useState(false);
+
+  const [typingStatus, setTypingStatus] = useState('');
 
   // Watch the socket to update chats and get notified
   useEffect(() => {
@@ -66,6 +68,16 @@ function ChatComponent({ socket, userState, chatBoxItem }) {
         setIsConnected(false);
       }
     });
+    socket.on('typing_notify', (from_userId) => {
+      if (from_userId === to_userId) {
+        setTypingStatus('typing...');
+      }
+    });
+    socket.on('typing_stopped_notify', (from_userId) => {
+      if (from_userId === to_userId) {
+        setTypingStatus('');
+      }
+    });
   }, []);
 
   // Notify others if user join or left the chat
@@ -94,9 +106,30 @@ function ChatComponent({ socket, userState, chatBoxItem }) {
   }, [chat]);
 
   useEffect(() => {
-    var element = document.getElementById('chat-list-' + elementId);
+    var element = document.getElementById('chat-list-' + to_userId);
     element.scrollTop = element.scrollHeight;
   }, [chatListElements]);
+
+  // Notify  when user is typing
+  useEffect(() => {
+    document
+      .getElementById(`message-input-${to_userId}`)
+      .addEventListener('keydown', typingNotify);
+    return () => {
+      document
+        .getElementById(`message-input-${to_userId}`)
+        .removeEventListener('keydown', typingNotify);
+    };
+  }, []);
+
+  let timer = null;
+  const typingNotify = () => {
+    socket.emit('typing_notify', to_userId);
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      socket.emit('typing_stopped_notify', to_userId);
+    }, 1000);
+  };
 
   // onChange
   const onChange = (e) => {
@@ -111,7 +144,7 @@ function ChatComponent({ socket, userState, chatBoxItem }) {
       socket.emit('private_message', to_userId, message);
       setMessage('');
     }
-    document.getElementById('message-input-' + elementId).focus();
+    document.getElementById('message-input-' + to_userId).focus();
   };
 
   return (
@@ -122,9 +155,8 @@ function ChatComponent({ socket, userState, chatBoxItem }) {
       <div className='chat-box'>
         <div className='chat-list-container'>
           <div className='heading'>
-            <p>
-              {to_name} ({to_userId})
-            </p>
+            <p>{to_name}</p>
+            <p>{typingStatus}</p>
 
             <div className='details-box'>
               {isConnected ? (
@@ -135,7 +167,7 @@ function ChatComponent({ socket, userState, chatBoxItem }) {
             </div>
           </div>
 
-          <div className='chat-list' id={`chat-list-` + elementId}>
+          <div className='chat-list' id={`chat-list-` + to_userId}>
             {chatListElements}
           </div>
         </div>
@@ -143,13 +175,13 @@ function ChatComponent({ socket, userState, chatBoxItem }) {
         <div className='chat-form'>
           <form onSubmit={onMessageSubmit}>
             <input
-              id={`message-input-` + elementId}
+              id={`message-input-` + to_userId}
               type='text'
               name='message'
               value={message}
               onChange={(e) => onChange(e)}
               placeholder='Type a message...'
-              autocomplete='off'
+              autoComplete='off'
               autoFocus
             />
             <button type='submit'>

@@ -95,7 +95,7 @@ function RoomListItem({
       <div className='status-div'>
         {room.host.userId === userState.userId && (
           <span
-            class='material-icons copy-btn'
+            className='material-icons copy-btn'
             title='Copy RoomID'
             onClick={(e) => copyToClipboard(e)}
           >

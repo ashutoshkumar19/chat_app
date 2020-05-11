@@ -483,7 +483,16 @@
           color: #fafafa;
           margin-left: 10px;
           font-size: 16px;
+          width: fit-content;
+
+          &:nth-child(2) {
+            margin-left: 25px;
+            font-size: 14px;
+            font-style: italic;
+            color: #b5ddee;
+          }
         }
+
         .details-box {
           margin-left: auto;
           margin-right: 10px;
@@ -501,6 +510,13 @@
             font-size: 13px !important;
           }
         }
+        .menu {
+          display: none;
+        }
+      }
+
+      .menu-container {
+        display: none;
       }
 
       .chat-list {
@@ -713,7 +729,7 @@
 
 /* For mobile screens*/
 
-@media only screen and (max-width: 400px) {
+@media only screen and (max-width: 600px) {
   .left-sidebar {
     position: absolute;
     z-index: 100;
@@ -761,10 +777,22 @@
     .chat-box {
       .chat-list-container {
         .heading {
+          height: 38px;
+          line-height: 38px;
+          background-color: #003a52;
+          padding-right: 5px;
+
           p {
             color: #fafafa;
             margin-left: 35px;
             font-size: 14px;
+
+            &:nth-child(2) {
+              margin-left: 10px;
+              font-size: 12px;
+              font-style: italic;
+              color: #b5ddee;
+            }
           }
           .details-box {
             margin-left: auto;
@@ -773,14 +801,75 @@
             .joined {
               font-size: 14px;
               color: #02df02;
+              margin-right: 10px;
             }
             .left {
               font-size: 14px;
               color: #ff5448;
+              margin-right: 10px;
             }
-            button {
-              margin-left: 5px;
-              font-size: 12px !important;
+            button.btn-top {
+              display: none;
+            }
+          }
+          .menu {
+            width: fit-content;
+            display: block;
+            margin: auto 0 auto auto;
+            margin-left: auto;
+            margin-right: 0px;
+            color: #fff;
+            user-select: none;
+            border-radius: 25px;
+            line-height: 36px;
+            padding: 0 6px;
+            transition: ease-in-out 200ms;
+
+            span {
+              margin: auto;
+              font-size: 24px;
+              vertical-align: middle;
+              color: #fff;
+            }
+
+            &:active {
+              background-color: #005f6b;
+            }
+          }
+        }
+        .menu-container {
+          background-color: #fff;
+          color: #1e1e1e;
+          position: absolute;
+          right: 0;
+          margin: 2px 5px;
+          border-radius: 5px;
+          overflow: hidden;
+
+          display: block;
+          max-width: 0;
+          max-height: 0;
+          visibility: hidden;
+
+          &.visible {
+            max-width: 150px;
+            max-height: 100px;
+            visibility: visible;
+            transition: ease-in-out 150ms;
+          }
+
+          .menu-item {
+            padding: 15px 15px;
+            user-select: none;
+            text-align: left;
+            word-wrap: break-word;
+            overflow: hidden;
+
+            &:hover {
+              background-color: #f0f0f0;
+            }
+            &:active {
+              background-color: #e0e0e0;
             }
           }
         }

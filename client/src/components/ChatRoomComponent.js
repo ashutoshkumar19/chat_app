@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { generateUserId } from './Functions';
 import UserListModal from './UserListModal.component';
 
-const elementId = generateUserId(5);
+// const elementId = generateUserId(5);
 
 function ChatRoomComponent({
   socket,
@@ -23,6 +23,9 @@ function ChatRoomComponent({
 
   const [chatListElements, setChatListElements] = useState('');
 
+  const [typingStatus, setTypingStatus] = useState('');
+
+  const [menuVisible, setMenuVisible] = useState(false);
   const [open, setOpen] = useState(false);
 
   // Watch the socket to update chats and get notified
@@ -39,7 +42,6 @@ function ChatRoomComponent({
     socket.on('join_room_notify', (from_roomId, from_userId, from_name, notify_text) => {
       if (from_roomId === roomId && from_userId !== userState.userId) {
         setChats('notification', from_userId, from_name, '#00b518', notify_text);
-        // socket.emit('join_room_notify_acknowledge', roomId, 'joined the chat');
       }
     });
     socket.on(
@@ -53,6 +55,28 @@ function ChatRoomComponent({
     socket.on('leave_room_notify', (from_roomId, from_userId, from_name, notify_text) => {
       if (from_roomId === roomId && from_userId !== userState.userId) {
         setChats('notification', from_userId, from_name, '#e00000', notify_text);
+      }
+    });
+    socket.on('removed_from_room_notify', (from_roomId, from_userId, from_name) => {
+      if (from_roomId === roomId && from_userId !== userState.userId) {
+        let notify_text = `${
+          currentRoom.host.userId === userState.userId
+            ? `You`
+            : `${currentRoom.host.name} (Host)`
+        } removed ${from_name}`;
+        setChats('host_notification', from_userId, from_name, '#e00000', notify_text);
+      }
+    });
+    socket.on('typing_room_notify', (from_roomId, from_userId, from_name) => {
+      if (from_roomId === roomId && from_userId !== userState.userId) {
+        console.log(`${from_name ? from_name : from_userId} is typing...`);
+
+        setTypingStatus(`${from_name ? from_name : from_userId} is typing...`);
+      }
+    });
+    socket.on('typing_stopped_room_notify', (from_roomId, from_userId) => {
+      if (from_roomId === roomId && from_userId !== userState.userId) {
+        setTypingStatus('');
       }
     });
 
@@ -150,6 +174,7 @@ function ChatRoomComponent({
       )
     ) {
       socket.emit('leave_room', roomId, userState.userId);
+      socket.emit('leave_room_notify', roomId, 'left the room');
     }
   };
 
@@ -168,11 +193,19 @@ function ChatRoomComponent({
             <p className='message'>{message}</p>
           </div>
         );
-      } else {
+      } else if (type === 'notification') {
         return (
           <div key={index} className='notification-bubble'>
             <p className='notification-text' style={{ color: `${color}` }}>
               {name.length > 0 ? name : userId} {message}
+            </p>
+          </div>
+        );
+      } else if (type === 'host_notification') {
+        return (
+          <div key={index} className='notification-bubble'>
+            <p className='notification-text' style={{ color: `${color}` }}>
+              {message}
             </p>
           </div>
         );
@@ -182,9 +215,30 @@ function ChatRoomComponent({
   }, [chat]);
 
   useEffect(() => {
-    var element = document.getElementById('chat-list-' + elementId);
+    var element = document.getElementById('chat-list-' + roomId);
     element.scrollTop = element.scrollHeight;
   }, [chatListElements]);
+
+  // Notify in room when user is typing
+  useEffect(() => {
+    document
+      .getElementById(`message-input-${roomId}`)
+      .addEventListener('keydown', typingNotify);
+    return () => {
+      document
+        .getElementById(`message-input-${roomId}`)
+        .removeEventListener('keydown', typingNotify);
+    };
+  }, []);
+
+  let timer = null;
+  const typingNotify = () => {
+    socket.emit('typing_room_notify', roomId);
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      socket.emit('typing_stopped_room_notify', roomId);
+    }, 1000);
+  };
 
   // onChange
   const onChange = (e) => {
@@ -199,7 +253,7 @@ function ChatRoomComponent({
       socket.emit('room_message', roomId, messageText);
       setMessage('');
     }
-    document.getElementById('message-input-' + elementId).focus();
+    document.getElementById('message-input-' + roomId).focus();
   };
 
   return (
@@ -211,10 +265,11 @@ function ChatRoomComponent({
         <div className='chat-list-container'>
           <div className='heading'>
             <p>RoomID: {roomId}</p>
+            <p>{typingStatus}</p>
 
             <div className='details-box'>
               <button
-                className='btn-outline btn-sm btn-outline-primary'
+                className='btn-outline btn-sm btn-outline-primary btn-top'
                 onClick={(e) => setOpen(true)}
               >
                 View Users
@@ -229,23 +284,60 @@ function ChatRoomComponent({
               )}
               {userState.userId === currentRoom.host.userId ? (
                 <button
-                  className='btn-outline btn-sm btn-outline-danger'
+                  className='btn-outline btn-sm btn-outline-danger btn-top'
                   onClick={() => closeRoom()}
                 >
                   Close Room
                 </button>
               ) : (
                 <button
-                  className='btn-outline btn-sm btn-outline-danger'
+                  className='btn-outline btn-sm btn-outline-danger btn-top'
                   onClick={() => leaveRoom()}
                 >
                   Leave Room
                 </button>
               )}
             </div>
+
+            <div className='menu' onClick={() => setMenuVisible(!menuVisible)}>
+              <span className='material-icons'>more_vert</span>
+            </div>
           </div>
 
-          <div className='chat-list' id={`chat-list-` + elementId}>
+          <div className={`menu-container ${menuVisible && `visible`}`}>
+            <div
+              className='menu-item'
+              onClick={(e) => {
+                setOpen(true);
+                setMenuVisible(false);
+              }}
+            >
+              View Users
+            </div>
+            {userState.userId === currentRoom.host.userId ? (
+              <div
+                className='menu-item'
+                onClick={() => {
+                  setMenuVisible(false);
+                  closeRoom();
+                }}
+              >
+                Close Room
+              </div>
+            ) : (
+              <div
+                className='menu-item'
+                onClick={() => {
+                  setMenuVisible(false);
+                  leaveRoom();
+                }}
+              >
+                Leave Room
+              </div>
+            )}
+          </div>
+
+          <div className='chat-list' id={`chat-list-` + roomId}>
             {chatListElements}
           </div>
         </div>
@@ -253,13 +345,13 @@ function ChatRoomComponent({
         <div className='chat-form'>
           <form onSubmit={onMessageSubmit}>
             <input
-              id={`message-input-` + elementId}
+              id={`message-input-` + roomId}
               type='text'
               name='message'
               value={message}
               onChange={(e) => onChange(e)}
               placeholder='Type a message...'
-              autocomplete='off'
+              autoComplete='off'
               autoFocus
             />
             <button type='submit'>

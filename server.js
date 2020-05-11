@@ -78,7 +78,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Notify clients when someone joins the chat
+  // Notify when someone joins the chat
   socket.on('join_notify', (to_userId) => {
     try {
       socketList[to_userId.toString()].emit('join_notify', socket.userId, socket.name);
@@ -86,7 +86,7 @@ io.on('connection', (socket) => {
       console.log(error);
     }
   });
-  // Acknowledge client that other client received the notification
+  // Acknowledge that other client received the notification
   socket.on('join_notify_acknowledge', (to_userId) => {
     try {
       socketList[to_userId.toString()].emit(
@@ -99,10 +99,26 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Notify clients when someone leaves the chat
+  // Notify when someone leaves the chat
   socket.on('leave_notify', (to_userId) => {
     try {
       socketList[to_userId.toString()].emit('leave_notify', socket.userId, socket.name);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // Notify when user is typing
+  socket.on('typing_notify', (to_userId) => {
+    try {
+      socketList[to_userId.toString()].emit('typing_notify', socket.userId);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  socket.on('typing_stopped_notify', (to_userId) => {
+    try {
+      socketList[to_userId.toString()].emit('typing_stopped_notify', socket.userId);
     } catch (error) {
       console.log(error);
     }
@@ -270,22 +286,65 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Notify in room when host removes any participant
+  socket.on('removed_from_room_notify', (roomId, userId) => {
+    try {
+      io.to(roomId).emit(
+        'removed_from_room_notify',
+        roomId,
+        userId,
+        socketList[userId].name
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // Notify in room when user is typing
+  socket.on('typing_room_notify', (roomId) => {
+    try {
+      io.to(roomId).emit('typing_room_notify', roomId, socket.userId, socket.name);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  socket.on('typing_stopped_room_notify', (roomId) => {
+    try {
+      io.to(roomId).emit('typing_stopped_room_notify', roomId, socket.userId);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
   // Remove socket from all rooms
   const removeSocketFromRooms = (socket) => {
     try {
       for (let i = 0; i < Object.keys(rooms).length; i++) {
         let roomId = Object.keys(rooms)[i];
+
         if (rooms[roomId].host.userId === socket.userId) {
           io.to(roomId).emit('room_closed', roomId);
+
           rooms[roomId].participants.map((participant) => {
             socketList[participant.userId].leave(roomId);
           });
+
           socket.leave(roomId);
         } else {
           rooms[roomId].participants.map((participant, index) => {
             if (participant.userId === socket.userId) {
               rooms[roomId].participants.splice(index, 1);
+
               io.to(roomId).emit('left_room', roomId, socket.userId);
+
+              io.to(roomId).emit(
+                'leave_room_notify',
+                roomId,
+                socket.userId,
+                socket.name,
+                'left the room'
+              );
+
               socketList[socket.userId].leave(roomId);
             }
           });

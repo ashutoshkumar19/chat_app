@@ -9,6 +9,7 @@ const UserListModal = ({ socket, userState, currentRoom, setOpen }) => {
       )
     ) {
       socket.emit('leave_room', currentRoom.roomId, userId);
+      socket.emit('removed_from_room_notify', currentRoom.roomId, userId);
     }
   };
 
@@ -25,6 +26,7 @@ const UserListModal = ({ socket, userState, currentRoom, setOpen }) => {
               {currentRoom.host.name.length > 0
                 ? currentRoom.host.name
                 : currentRoom.host.userId}
+              {currentRoom.host.userId === userState.userId && ' (You)'}
             </div>
             <div className='host-badge'>Host</div>
           </div>
