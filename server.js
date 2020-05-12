@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
@@ -376,6 +377,12 @@ io.on('connection', (socket) => {
 });
 
 /***************************************************************************/
+
+app.get('/api', (req, res) => {
+  console.log('PING RECEIVED');
+  res.send('success');
+});
+
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   // Set static folder

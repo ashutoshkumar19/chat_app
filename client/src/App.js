@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import io from 'socket.io-client';
+import axios from 'axios';
 
 import LeftSidebarComponent from './components/LeftSidebarComponent';
 import ChatComponent from './components/ChatComponent';
@@ -25,6 +26,17 @@ function App() {
   const [roomList, setRoomList] = useState([]);
 
   const [chatBoxList, setChatBoxList] = useState([]);
+
+  // Ping Heroku server at fixed interval to stop it from sleeping
+  useEffect(() => {
+    setInterval(() => {
+      pingServer();
+    }, 600000);
+  }, []);
+  const pingServer = () => {
+    const res = axios.get('/api');
+    console.log(res);
+  };
 
   useEffect(() => {
     console.log('***********************');
