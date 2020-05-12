@@ -667,6 +667,7 @@
       font-size: 28px;
       transition: ease-in-out 250px;
       cursor: pointer;
+      user-select: none;
 
       &:hover {
         background-color: #aeaeae;
@@ -860,7 +861,7 @@
             }
 
             &:active {
-              background-color: #005f6b;
+              background-color: #4e4e4e;
             }
           }
         }
@@ -966,6 +967,14 @@
             }
           }
         }
+      }
+    }
+  }
+
+  .modal-container {
+    .modal {
+      .close {
+        cursor: default;
       }
     }
   }

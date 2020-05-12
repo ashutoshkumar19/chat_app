@@ -83,6 +83,7 @@ function ChatRoomComponent({
 
     socket.on('room_closed', (closedRoomId) => {
       try {
+        setIsSidebarHidden(false);
         setChatBoxList((prevList) => {
           let tempList = prevList;
           tempList = tempList.filter((item) => item.id !== closedRoomId);
@@ -93,7 +94,6 @@ function ChatRoomComponent({
           tempList = tempList.filter((roomItem) => roomItem.roomId !== closedRoomId);
           return tempList;
         });
-        setIsSidebarHidden(false);
       } catch (error) {
         console.log(error);
       }
@@ -102,6 +102,7 @@ function ChatRoomComponent({
     socket.on('left_room', (from_roomId, leftUserId) => {
       try {
         if (leftUserId === userState.userId) {
+          setIsSidebarHidden(false);
           setChatBoxList((prevList) => {
             let tempList = prevList;
             tempList = tempList.filter((item) => item.id !== from_roomId);
@@ -112,7 +113,6 @@ function ChatRoomComponent({
             tempList = tempList.filter((roomItem) => roomItem.roomId !== from_roomId);
             return tempList;
           });
-          setIsSidebarHidden(false);
         } else {
           setRoomList((prevList) => {
             let tempList = prevList;
