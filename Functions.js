@@ -13,7 +13,7 @@ module.exports = {
   // Generate random room id
   generateRoomId: function (length) {
     let result = '';
-    let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let charactersLength = characters.length;
     for (let i = 0; i < length; i++) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -27,10 +27,10 @@ module.exports = {
     return randomColor;
   },
 
-  // Generate random Id
+  // Generate random userId
   generateUserId: function (length) {
     let result = '';
-    let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
     let charactersLength = characters.length;
     for (let i = 0; i < length; i++) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));

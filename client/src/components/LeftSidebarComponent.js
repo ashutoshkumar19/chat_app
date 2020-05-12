@@ -15,10 +15,10 @@ function LeftSidebarComponent({
   setChatBoxList,
   roomList,
   setRoomList,
+  isSidebarHidden,
+  setIsSidebarHidden,
 }) {
   const { userId, name, color } = userState;
-
-  const [isSidebarHidden, setIsSidebarHidden] = useState(false);
 
   // Tell server to add new user when userId changes
   useEffect(() => {

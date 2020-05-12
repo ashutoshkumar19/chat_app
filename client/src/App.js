@@ -27,6 +27,8 @@ function App() {
 
   const [chatBoxList, setChatBoxList] = useState([]);
 
+  const [isSidebarHidden, setIsSidebarHidden] = useState(false);
+
   // Ping Heroku server at fixed interval to stop it from sleeping
   useEffect(() => {
     setInterval(() => {
@@ -59,6 +61,8 @@ function App() {
             setChatBoxList={setChatBoxList}
             roomList={roomList}
             setRoomList={setRoomList}
+            isSidebarHidden={isSidebarHidden}
+            setIsSidebarHidden={setIsSidebarHidden}
           />
 
           {chatBoxList.map((item, index) => {
@@ -73,6 +77,7 @@ function App() {
                   currentRoom={currentRoom}
                   setRoomList={setRoomList}
                   setChatBoxList={setChatBoxList}
+                  setIsSidebarHidden={setIsSidebarHidden}
                 />
               );
             } else {

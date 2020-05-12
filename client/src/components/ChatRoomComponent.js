@@ -12,6 +12,7 @@ function ChatRoomComponent({
   currentRoom,
   setRoomList,
   setChatBoxList,
+  setIsSidebarHidden,
 }) {
   const roomId = currentRoom.roomId;
   const roomName = chatBoxItem.name;
@@ -69,9 +70,9 @@ function ChatRoomComponent({
     });
     socket.on('typing_room_notify', (from_roomId, from_userId, from_name) => {
       if (from_roomId === roomId && from_userId !== userState.userId) {
-        console.log(`${from_name ? from_name : from_userId} is typing...`);
-
-        setTypingStatus(`${from_name ? from_name : from_userId} is typing...`);
+        setTypingStatus(
+          `${from_name ? from_name.split(' ')[0] : from_userId} is typing...`
+        );
       }
     });
     socket.on('typing_stopped_room_notify', (from_roomId, from_userId) => {
@@ -92,6 +93,7 @@ function ChatRoomComponent({
           tempList = tempList.filter((roomItem) => roomItem.roomId !== closedRoomId);
           return tempList;
         });
+        setIsSidebarHidden(false);
       } catch (error) {
         console.log(error);
       }
@@ -110,6 +112,7 @@ function ChatRoomComponent({
             tempList = tempList.filter((roomItem) => roomItem.roomId !== from_roomId);
             return tempList;
           });
+          setIsSidebarHidden(false);
         } else {
           setRoomList((prevList) => {
             let tempList = prevList;

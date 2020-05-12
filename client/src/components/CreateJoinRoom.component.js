@@ -50,14 +50,6 @@ function CreateJoinRoom({ socket, userState, roomList, setRoomList }) {
     socket.emit('join_room', formData);
     setFormData('');
     setShowForm(false);
-    // if (window.confirm('Are you sure? You will be exited from current room!')) {
-    //   try {
-    //     setRoomList({ ...roomList, joinRoomId: formData });
-    //     setFormData('');
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
   };
 
   const createRoom = (e) => {
