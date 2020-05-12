@@ -105,7 +105,7 @@ function RoomListItem({
         <div className='status-color'></div>
       </div>
 
-      {showTooltip && <div className='tooltip'>RoomID copied to clipboard</div>}
+      {showTooltip && <div className='tooltip'>RoomID copied</div>}
     </li>
   );
 }

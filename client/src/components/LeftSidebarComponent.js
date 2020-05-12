@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 
 import Avatar from '../images/avatar.png';
 
@@ -37,9 +37,75 @@ function LeftSidebarComponent({
   }, []);
 
   return (
-    <div className={`left-sidebar ${isSidebarHidden && `hidden`}`}>
+    <Fragment>
       <div
-        className={`sidebar-toggle ${isSidebarHidden && `menu-btn`}`}
+        className={`left-sidebar-container ${isSidebarHidden && `hidden`}`}
+        onClick={() => setIsSidebarHidden(true)}
+      >
+        <div
+          className={`left-sidebar ${isSidebarHidden && `hidden`}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className='current-user' id='current-user'>
+            <div className='avatar'>
+              <img src={Avatar} alt='' />
+            </div>
+            <div className='details'>
+              {name.length > 0 && (
+                <div style={{ display: 'flex' }}>
+                  <p className='name' title={name}>
+                    {name}
+                  </p>
+                </div>
+              )}
+              <p className='userId'>
+                User Id: <span>{userId}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className='btn-container' id='btn-container'>
+            <CreateJoinRoom
+              socket={socket}
+              userState={userState}
+              roomList={roomList}
+              setRoomList={setRoomList}
+            />
+          </div>
+
+          <div className='user-list-container'>
+            <p className='heading'>Online users and rooms</p>
+
+            <ul className='user-list'>
+              {roomList.map((room, index) => (
+                <RoomListItem
+                  key={index}
+                  room={room}
+                  userState={userState}
+                  chatBoxList={chatBoxList}
+                  setChatBoxList={setChatBoxList}
+                  setIsSidebarHidden={setIsSidebarHidden}
+                />
+              ))}
+
+              {userList.map(
+                (user, index) =>
+                  user.userId !== userId && (
+                    <UserListItem
+                      key={index}
+                      user={user}
+                      chatBoxList={chatBoxList}
+                      setChatBoxList={setChatBoxList}
+                      setIsSidebarHidden={setIsSidebarHidden}
+                    />
+                  )
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div
+        className={`sidebar-toggle ${isSidebarHidden && `hidden`}`}
         onClick={() => setIsSidebarHidden(!isSidebarHidden)}
       >
         {isSidebarHidden ? (
@@ -48,64 +114,7 @@ function LeftSidebarComponent({
           <span className='material-icons'>arrow_back</span>
         )}
       </div>
-
-      <div className='current-user' id='current-user'>
-        <div className='avatar'>
-          <img src={Avatar} alt='' />
-        </div>
-        <div className='details'>
-          {name.length > 0 && (
-            <div style={{ display: 'flex' }}>
-              <p className='name' title={name}>
-                {name}
-              </p>
-            </div>
-          )}
-          <p className='userId'>
-            User Id: <span>{userId}</span>
-          </p>
-        </div>
-      </div>
-
-      <div className='btn-container' id='btn-container'>
-        <CreateJoinRoom
-          socket={socket}
-          userState={userState}
-          roomList={roomList}
-          setRoomList={setRoomList}
-        />
-      </div>
-
-      <div className='user-list-container'>
-        <p className='heading'>Online users and rooms</p>
-
-        <ul className='user-list'>
-          {roomList.map((room, index) => (
-            <RoomListItem
-              key={index}
-              room={room}
-              userState={userState}
-              chatBoxList={chatBoxList}
-              setChatBoxList={setChatBoxList}
-              setIsSidebarHidden={setIsSidebarHidden}
-            />
-          ))}
-
-          {userList.map(
-            (user, index) =>
-              user.userId !== userId && (
-                <UserListItem
-                  key={index}
-                  user={user}
-                  chatBoxList={chatBoxList}
-                  setChatBoxList={setChatBoxList}
-                  setIsSidebarHidden={setIsSidebarHidden}
-                />
-              )
-          )}
-        </ul>
-      </div>
-    </div>
+    </Fragment>
   );
 }
 

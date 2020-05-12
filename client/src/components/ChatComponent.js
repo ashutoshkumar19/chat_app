@@ -150,6 +150,7 @@ function ChatComponent({ socket, userState, chatBoxItem }) {
   return (
     <div
       className='chat-box-container'
+      id={`chat-box-container-${to_userId}`}
       style={status === 0 ? { display: 'none' } : { display: 'block' }}
     >
       <div className='chat-box'>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
+import { useSwipeable } from 'react-swipeable';
 
 import LeftSidebarComponent from './components/LeftSidebarComponent';
 import ChatComponent from './components/ChatComponent';
@@ -14,7 +15,7 @@ import LandingComponent from './components/LandingComponent';
 // const socket = io.connect('http://localhost:5000');
 const socket = io.connect('/');
 
-function App() {
+const App = () => {
   const [userState, setUserState] = useState({
     userId: generateUserId(7),
     name: '',
@@ -40,6 +41,13 @@ function App() {
     console.log(res);
   };
 
+  const handlers = useSwipeable({
+    onSwipedLeft: () => setIsSidebarHidden(true),
+    onSwipedRight: () => setIsSidebarHidden(false),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+  });
+
   useEffect(() => {
     console.log('***********************');
     console.log(chatBoxList);
@@ -47,7 +55,7 @@ function App() {
   }, [chatBoxList]);
 
   return (
-    <div className='main-content'>
+    <div className='main-content' {...handlers}>
       {userState.name.length === 0 ? (
         <LandingComponent userState={userState} setUserState={setUserState} />
       ) : (
@@ -95,6 +103,6 @@ function App() {
       )}
     </div>
   );
-}
+};
 
 export default App;

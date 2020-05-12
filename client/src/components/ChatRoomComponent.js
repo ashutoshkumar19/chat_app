@@ -262,6 +262,7 @@ function ChatRoomComponent({
   return (
     <div
       className='chat-box-container'
+      id={`chat-box-container-${roomId}`}
       style={status === 0 ? { display: 'none' } : { display: 'block' }}
     >
       <div className='chat-box'>
