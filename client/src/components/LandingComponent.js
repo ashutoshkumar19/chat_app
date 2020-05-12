@@ -59,6 +59,7 @@ const LandingComponent = ({ userState, setUserState }) => {
             type='text'
             name='name'
             autoFocus
+            autoComplete='off'
             value={formData}
             onChange={onChange}
             className={`input ${error && `error`}`}

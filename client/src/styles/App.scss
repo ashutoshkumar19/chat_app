@@ -487,8 +487,8 @@
 
           &:nth-child(2) {
             margin-left: 25px;
-            font-size: 14px;
-            font-style: italic;
+            font-size: 13px;
+            font-style: normal;
             color: #b5ddee;
           }
         }
@@ -729,7 +729,7 @@
 
 /* For mobile screens*/
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 750px) {
   .left-sidebar {
     position: absolute;
     z-index: 100;
@@ -772,14 +772,16 @@
   }
 
   .chat-box-container {
-    height: calc(100% - 55px);
+    // height: calc(100% - 55px);
+    height: calc(100% - 0px);
 
     .chat-box {
       .chat-list-container {
         .heading {
           height: 38px;
           line-height: 38px;
-          background-color: #003a52;
+          // background-color: #003a52;
+          background-color: #1e1e1e;
           padding-right: 5px;
 
           p {
@@ -789,8 +791,8 @@
 
             &:nth-child(2) {
               margin-left: 10px;
-              font-size: 12px;
-              font-style: italic;
+              font-size: 12.5px;
+              font-style: normal;
               color: #b5ddee;
             }
           }
