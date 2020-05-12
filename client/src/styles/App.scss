@@ -953,11 +953,12 @@
             padding: 3px 10px;
             border-radius: 5px;
             transition: ease-in-out 250ms;
-            cursor: pointer;
+            cursor: default;
             user-select: none;
 
             span {
               user-select: none;
+              cursor: default;
             }
 
             &:hover,
