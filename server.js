@@ -144,9 +144,16 @@ io.on('connection', (socket) => {
         rooms[roomId] = room;
 
         room = { roomId: roomId, ...room };
-        console.log(room);
 
         socket.emit('room_created', room);
+
+        // console.log(room);
+        console.log('---------------------------ROOMS---------------------------');
+        for (let i = 0; i < Object.keys(rooms).length; i++) {
+          let roomId = Object.keys(rooms)[i];
+          console.log(rooms[roomId]);
+        }
+        console.log('-----------------------------------------------------------');
       }
     } catch (error) {
       console.log(error);
@@ -320,10 +327,14 @@ io.on('connection', (socket) => {
   // Remove socket from all rooms
   const removeSocketFromRooms = (socket) => {
     try {
-      for (let i = 0; i < Object.keys(rooms).length; i++) {
+      let roomsToDelete = [];
+      const roomCount = Object.keys(rooms).length;
+
+      for (let i = 0; i < roomCount; i++) {
         let roomId = Object.keys(rooms)[i];
 
         if (rooms[roomId].host.userId === socket.userId) {
+          console.log(rooms[roomId]);
           io.to(roomId).emit('room_closed', roomId);
 
           rooms[roomId].participants.map((participant) => {
@@ -331,6 +342,7 @@ io.on('connection', (socket) => {
           });
 
           socket.leave(roomId);
+          roomsToDelete.push(roomId);
         } else {
           rooms[roomId].participants.map((participant, index) => {
             if (participant.userId === socket.userId) {
@@ -351,6 +363,16 @@ io.on('connection', (socket) => {
           });
         }
       }
+      // Delete all rooms created by disconnected host
+      for (let i = 0; i < roomsToDelete.length; i++) {
+        delete rooms[roomsToDelete[i]];
+      }
+      // console.log('---------------------------ROOMS---------------------------');
+      // for (let i = 0; i < Object.keys(rooms).length; i++) {
+      //   let roomId = Object.keys(rooms)[i];
+      //   console.log(rooms[roomId]);
+      // }
+      // console.log('-----------------------------------------------------------');
     } catch (error) {
       console.log(error);
     }
