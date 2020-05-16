@@ -55,6 +55,7 @@ function ChatRoomComponent({
         setChats('notification', from_userId, from_name, '#e00000', notify_text);
       }
     });
+
     socket.on('removed_from_room_notify', (from_roomId, from_userId, from_name) => {
       if (from_roomId === roomId && from_userId !== userState.userId) {
         let notify_text = `${
@@ -65,6 +66,7 @@ function ChatRoomComponent({
         setChats('host_notification', from_userId, from_name, '#e00000', notify_text);
       }
     });
+
     socket.on('typing_room_notify', (from_roomId, from_userId, from_name) => {
       if (from_roomId === roomId && from_userId !== userState.userId) {
         setTypingStatus(
@@ -72,61 +74,10 @@ function ChatRoomComponent({
         );
       }
     });
+
     socket.on('typing_stopped_room_notify', (from_roomId, from_userId) => {
       if (from_roomId === roomId && from_userId !== userState.userId) {
         setTypingStatus('');
-      }
-    });
-
-    socket.on('room_closed', (closedRoomId) => {
-      try {
-        setIsSidebarHidden(false);
-        setChatBoxList((prevList) => {
-          let tempList = prevList;
-          tempList = tempList.filter((item) => item.id !== closedRoomId);
-          return tempList;
-        });
-        setRoomList((prevList) => {
-          let tempList = prevList;
-          tempList = tempList.filter((roomItem) => roomItem.roomId !== closedRoomId);
-          return tempList;
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    });
-
-    socket.on('left_room', (from_roomId, leftUserId) => {
-      try {
-        if (leftUserId === userState.userId) {
-          setIsSidebarHidden(false);
-          setChatBoxList((prevList) => {
-            let tempList = prevList;
-            tempList = tempList.filter((item) => item.id !== from_roomId);
-            return tempList;
-          });
-          setRoomList((prevList) => {
-            let tempList = prevList;
-            tempList = tempList.filter((roomItem) => roomItem.roomId !== from_roomId);
-            return tempList;
-          });
-        } else {
-          setRoomList((prevList) => {
-            let tempList = prevList;
-            var roomIndex = tempList.findIndex(
-              (roomItem) => roomItem.roomId === from_roomId
-            );
-            let temp = tempList[roomIndex].participants.filter(
-              (participant) => participant.userId !== leftUserId
-            );
-            tempList[roomIndex].participants = temp;
-            return tempList;
-          });
-          setOpen((prevState) => !prevState);
-          setOpen((prevState) => !prevState);
-        }
-      } catch (error) {
-        console.log(error);
       }
     });
   }, []);

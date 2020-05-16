@@ -1,7 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import '../styles/landing.scss';
 
-import { generateRandomColor } from './Functions';
+import { generateUserId, generateRandomColor } from './Functions';
 
 const LandingComponent = ({ userState, setUserState }) => {
   const { userId, name, color } = userState;
@@ -24,7 +24,11 @@ const LandingComponent = ({ userState, setUserState }) => {
     e.preventDefault();
     let name_text = formData.trim();
     if (name_text.length > 0) {
-      setUserState({ ...userState, name: name_text, color: generateRandomColor() });
+      setUserState({
+        userId: generateUserId(7),
+        name: name_text,
+        color: generateRandomColor(),
+      });
     } else {
       setError(true);
       document.getElementsByClassName('input')[0].focus();

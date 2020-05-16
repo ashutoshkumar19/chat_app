@@ -33,26 +33,30 @@ io.on('connection', (socket) => {
   });
 
   // Change name of user
-  socket.on('change_name', (name, color) => {
-    try {
-      for (let i = 0; i < users.length; i++) {
-        if (users[i].userId === socket.userId) {
-          users[i].name = name;
-          users[i].color = color;
-          break;
+  {
+    /*
+    socket.on('change_name', (name, color) => {
+      try {
+        for (let i = 0; i < users.length; i++) {
+          if (users[i].userId === socket.userId) {
+            users[i].name = name;
+            users[i].color = color;
+            break;
+          }
         }
+        socket.name = name;
+        socket.color = color;
+
+        updateUsernames();
+
+        console.log('\nName Changed...');
+        console.log(users);
+      } catch (error) {
+        console.log(error);
       }
-      socket.name = name;
-      socket.color = color;
-
-      updateUsernames();
-
-      console.log('\nName Changed...');
-      console.log(users);
-    } catch (error) {
-      console.log(error);
-    }
-  });
+    });
+  */
+  }
 
   // Update name on clients
   const updateUsernames = () => {
@@ -384,7 +388,8 @@ io.on('connection', (socket) => {
       users = users.filter((user) => user.userId !== socket.userId);
       delete socketList[socket.userId];
       io.emit('leave_notify', socket.userId, socket.name);
-      updateUsernames();
+      io.emit('user_disconnected', socket.userId);
+      // updateUsernames();
       console.log(`\n${socket.name} (${socket.userId}) disconnected`);
     } catch (error) {
       console.log(error);

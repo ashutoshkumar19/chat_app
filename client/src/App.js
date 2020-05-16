@@ -7,8 +7,6 @@ import LeftSidebarComponent from './components/LeftSidebarComponent';
 import ChatComponent from './components/ChatComponent';
 import ChatRoomComponent from './components/ChatRoomComponent';
 
-import { generateUserId, generateRandomColor } from './components/Functions';
-
 import './styles/App.scss';
 import LandingComponent from './components/LandingComponent';
 
@@ -17,9 +15,9 @@ const socket = io.connect('/');
 
 const App = () => {
   const [userState, setUserState] = useState({
-    userId: generateUserId(7),
+    userId: '',
     name: '',
-    color: generateRandomColor(),
+    color: '',
   });
 
   const [userList, setUserList] = useState([]);
