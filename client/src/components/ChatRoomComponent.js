@@ -98,6 +98,7 @@ function ChatRoomComponent({
   // Notify others if user joins or leaves the room
   useEffect(() => {
     if (status === 1) {
+      document.getElementById(`message-input-` + roomId).focus();
       socket.emit('join_room_notify', roomId, 'joined the chat');
     } else {
       socket.emit('leave_room_notify', roomId, 'left the chat');

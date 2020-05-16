@@ -83,6 +83,7 @@ function ChatComponent({ socket, userState, chatBoxItem }) {
   // Notify others if user join or left the chat
   useEffect(() => {
     if (status === 1) {
+      document.getElementById(`message-input-` + to_userId).focus();
       socket.emit('join_notify', to_userId);
     } else {
       socket.emit('leave_notify', to_userId);
