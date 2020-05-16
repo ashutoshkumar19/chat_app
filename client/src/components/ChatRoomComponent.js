@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// import 'emoji-mart/css/emoji-mart.css';
-// import { Picker, Emoji } from 'emoji-mart';
-// import Smiley from '../images/smiley.svg';
-
 import UserListModal from './UserListModal.component';
 
 function ChatRoomComponent({
@@ -29,8 +25,6 @@ function ChatRoomComponent({
 
   const [menuVisible, setMenuVisible] = useState(false);
   const [open, setOpen] = useState(false);
-
-  // const [emojiPicker, setEmojiPicker] = useState(false);
 
   // Watch the socket to update chats and get notified
   useEffect(() => {
@@ -350,39 +344,12 @@ function ChatRoomComponent({
         </div>
 
         <div className='chat-form'>
-          {/* {emojiPicker && (
-            <div className={`emoji-picker ${!emojiPicker && `hidden`}`}>
-              <Picker
-                title='Pick your emoji…'
-                set={'google'}
-                emojiSize={30}
-                perLine={8}
-                // emoji={'smiley'}
-                showPreview={false}
-                onSelect={(emoji) => {
-                  console.log(emoji);
-                  let newMessage = message;
-                  newMessage = newMessage + emoji.native;
-                  setMessage(newMessage);
-                }}
-                style={{ width: '100' }}
-              />
-              <Emoji emoji={{ id: 'smile, skin: 1, set: 'apple' }} size={24} />
-            </div>
-          )} */}
           <form onSubmit={onMessageSubmit}>
-            {/* <div
-              className='emoji-picker-btn'
-              onClick={() => setEmojiPicker(!emojiPicker)}
-            >
-              <span className={`fas fa-${emojiPicker ? `keyboard` : `smile`}`}></span>
-            </div> */}
             <input
               id={`message-input-` + roomId}
               type='text'
               name='message'
               value={message}
-              // onClick={() => setEmojiPicker(false)}
               onChange={(e) => onChange(e)}
               placeholder='Type a message...'
               autoComplete='off'

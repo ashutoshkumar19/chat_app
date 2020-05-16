@@ -582,37 +582,12 @@
       bottom: 0;
       width: 100%;
 
-      // .emoji-picker {
-      //   position: absolute;
-      //   width: 415px;
-      //   bottom: 50px;
-      //   left: 5px;
-
-      //   &.hidden {
-      //     visibility: hidden;
-      //   }
-      // }
-
       form {
         margin: 0px auto;
         width: 100%;
         padding: 0 8px;
         display: flex;
         height: 100%;
-
-        // .emoji-picker-btn {
-        //   font-size: 22px;
-        //   position: absolute;
-        //   margin-left: 8px;
-        //   margin-top: 4px;
-        //   color: #2e2e2e;
-        //   cursor: pointer;
-
-        //   span {
-        //     width: 100%;
-        //     height: 100%;
-        //   }
-        // }
 
         input {
           width: 100%;
@@ -624,7 +599,6 @@
           border: 1px solid #e0e0e0;
           border-radius: 5px;
           padding: 5px 10px;
-          // padding: 5px 38px;
           font-size: 18px;
           transition: ease-in-out 250ms;
 
@@ -941,25 +915,12 @@
         bottom: 0;
         width: 100%;
 
-        // .emoji-picker {
-        //   width: 100%;
-        //   left: 0px;
-        // }
-
         form {
           margin: 0px auto;
           width: 100%;
           padding: 0 8px;
           display: flex;
           height: 100%;
-
-          // .emoji-picker-btn {
-          //   font-size: 24px;
-          //   margin-left: 6px;
-          //   margin-top: 4px;
-          //   color: #8e8e8e;
-          //   cursor: default;
-          // }
 
           input {
             width: 100%;
@@ -971,7 +932,6 @@
             border: 1px solid #e0e0e0;
             border-radius: 5px;
             padding: 5px 10px;
-            // padding: 5px 35px;
             font-size: 18px;
             transition: ease-in-out 250ms;
 
